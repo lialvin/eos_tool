@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/gina/chainbase",
+  "command": "/usr/bin/c++   -I/home/gina/chainbase/include -I/usr/local/include   -std=c++11 -Wall -fno-builtin-memcmp   -o CMakeFiles/chainbase.dir/src/chainbase.cpp.o -c /home/gina/chainbase/src/chainbase.cpp",
+  "file": "/home/gina/chainbase/src/chainbase.cpp"
+},
+{
+  "directory": "/home/gina/chainbase/test",
+  "command": "/usr/bin/c++   -I/home/gina/chainbase/include -I/usr/local/include   -std=c++11 -Wall -fno-builtin-memcmp   -o CMakeFiles/chainbase_test.dir/test.cpp.o -c /home/gina/chainbase/test/test.cpp",
+  "file": "/home/gina/chainbase/test/test.cpp"
+}
+]
