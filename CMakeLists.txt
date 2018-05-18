@@ -86,7 +86,7 @@ add_subdirectory(testboost)
 #add_subdirectory(tests) 
 #add_subdirectory(appbase) 
 #add_subdirectory(chainbase) 
-add_subdirectory(variadic-variant) 
+add_subdirectory(variant) 
  
 
 
