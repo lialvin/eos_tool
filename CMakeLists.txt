@@ -83,6 +83,7 @@ message(STATUS "CXX_FLAGS = " ${CMAKE_CXX_FLAGS} " " ${CMAKE_CXX_FLAGS_${BUILD_T
 
 add_subdirectory(libqtutils)
 add_subdirectory(testboost)
+add_subdirectory(utasio)
 #add_subdirectory(tests) 
 #add_subdirectory(appbase) 
 #add_subdirectory(chainbase) 
