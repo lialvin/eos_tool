@@ -5,6 +5,39 @@
 
 namespace bpo = boost::program_options;  
 
+#define define_functor_type(func_name) class tfn_##func_name {\
+   public: template <typename... Args> auto operator()(Args&&... args) const ->decltype(func_name(std::forward<Args>(args)...))\
+   {  \
+      return func_name(std::forward<Args>(args)...);\
+   } \
+}
+
+//test code
+int add(int a, int b)
+{
+    return a + b;
+}
+
+int add_one(int a) 
+{ 
+    return 1 + a; 
+}
+
+define_functor_type(add);
+define_functor_type(add_one);
+
+int test()
+{
+    tfn_add add_functor;
+    add_functor(1, 2); //result is 3
+
+    tfn_add_one add_one_functor;
+    add_one_functor(1); //result is 2
+
+    return 0;
+}
+
+
 int main(int argc, char const *argv[])  
 {  
     //外部变量，用于保存获取的参数值  

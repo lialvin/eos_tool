@@ -25,3 +25,5 @@ target_link_libraries(test_steady_time  ${IMPORTLIB})
 add_executable(test_bpo   bpo.cpp)
 target_link_libraries(test_bpo  ${IMPORTLIB})
 
+add_executable(test_multi   mulindex.cpp)
+target_link_libraries(test_multi  ${IMPORTLIB})
