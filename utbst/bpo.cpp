@@ -2,6 +2,9 @@
 #include <vector>  
 #include <string>  
 #include <boost/program_options.hpp>  
+#include <algorithm>  
+#include "boost/lambda/lambda.hpp"  
+#include "boost/tuple/tuple.hpp"  
 
 namespace bpo = boost::program_options;  
 
@@ -34,6 +37,29 @@ int test()
     tfn_add_one add_one_functor;
     add_one_functor(1); //result is 2
 
+
+    using namespace boost::lambda;  
+    using namespace std;  
+  
+  
+    boost::tuple<int,double,string> triple(42, 3.245, "The amazing tuple!");  
+    int  a0  =  triple.get<0>();  
+    double  a1  =  triple.get<1>();  
+    string  a2  =  triple.get<2>();  
+      
+    std::vector<int> vec(3);  
+    vec[0] = 12;  
+    vec[1] = 10;  
+    vec[2] = 7;  
+  
+    //Transform using a lambda expression  
+    std::cout<<endl;
+    std::for_each(vec.begin(), vec.end(), std::cout<<_1);  
+    std::cout<<endl;
+    std::for_each(vec.begin(), vec.end(), std::cout<<_1<<' ');  
+    std::cout<<endl;
+    //std::transform(vec.begin(), vec.end(), vec.begin(), _1-= 4);  
+    //
     return 0;
 }
 
@@ -41,6 +67,8 @@ int test()
 int main(int argc, char const *argv[])  
 {  
     //外部变量，用于保存获取的参数值  
+     
+    test();
     int apple_num = 0, orange_num = 0;  
     std::vector<std::string> addr;  
     bpo::options_description opt("all options");  
