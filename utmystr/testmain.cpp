@@ -37,10 +37,13 @@ int main(int argc, char* argv[])
 
    MyString cabc=MyString("abc");
    std::string abcd;
+   std::string abcd1("11111111111111111111111111111111222222222222222222222222222222222222aaaaaaaaaaaaaaa"
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc");
    int length = sizeof(abcd);
+   length = sizeof(abcd1);
    cout<<"sizeof(abcd) = "<< length <<"  std::string= "<< sizeof(std::string)<<endl;
    
-   int m = [](int x) { return [](int x) { return x * 2; } (x)+6; }(5);
+   int m = [](int x) { return [](int y) { return y * 2; }(x+3)+x+6; }(5);
     
    cout<< m <<std::endl ; 
 
@@ -51,8 +54,20 @@ int main(int argc, char* argv[])
    string  dbuser ,dbhost, dbpass;
    int startheight, endheight;
    readcfg(startheight,endheight,dbuser,dbhost,dbpass);
-    
- 
+
+
+   std::string str1{"abcderg"};     
+   for(auto c : str1.substr(1)) 
+   {
+      cout<< c<<", str1="<<str1<<endl;      
+   }
+      
+   cout<< " str1="<<str1.substr(1)<<endl;      
+
+   for(auto c : str1.substr(1)) 
+   {
+      cout<< c<<", str1="<<str1<<endl;      
+   }
     
    double b=25.0;
    double a=0.0;

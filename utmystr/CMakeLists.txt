@@ -26,7 +26,7 @@ boost_log_setup  boost_log
 
 )
 
-add_executable(testboost ${MAIN_SRC_LIST}  ${MAIN_HEADERS})
-target_link_libraries(testboost ${IMPORTLIB})
+add_executable(utmystr ${MAIN_SRC_LIST}  ${MAIN_HEADERS})
+target_link_libraries(utmystr ${IMPORTLIB})
 
 
