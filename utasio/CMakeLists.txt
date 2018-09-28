@@ -17,6 +17,9 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
 set(IMPORTLIB 
    boost_system 
+   boost_log_setup
+   boost_log
+   boost_thread
 )
 
 add_executable(async_server  async_tcp_echo_server.cpp)

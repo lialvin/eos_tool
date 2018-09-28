@@ -5,10 +5,7 @@
 #include "testmain.h"
 #include <boost/format.hpp>
 
-//展开函数
-//
 
-//递归终止函数
 void print()
 {
    cout << "empty" << endl;
@@ -20,6 +17,41 @@ void print(T head, Args... rest)
       print(rest...);
 }
 
+void test1()
+{
+  std::map<char,int> mymap;
+  std::map<char,int>::iterator it;
+
+  // insert some values:
+  mymap['a']=10;
+  mymap['b']=20;
+  mymap['c']=30;
+  mymap['d']=40;
+  mymap['e']=50;
+  mymap['f']=60;
+
+  it=mymap.find('b');
+  mymap.erase (it);                   // erasing by iterator
+  int a = it->second;
+  a = it->second;
+  it=mymap.find('c');
+
+  a = it->second;
+  
+  mymap.erase ('c');                  // erasing by key
+
+  it++;
+
+  a = it->second;
+
+  it=mymap.find ('e');
+  mymap.erase ( it, mymap.end() );    // erasing by range
+
+  // show content:
+  for (it=mymap.begin(); it!=mymap.end(); ++it)
+    std::cout << it->first << " => " << it->second << '\n';
+
+}
 #define STRING(x)  #x#x#x
 #define TEXT(x)  "class"#x"Info"
 #define CLASS_NAME(name) class##name
@@ -28,7 +60,7 @@ int main(int argc, char* argv[])
 {
 
    int aab=100;
-
+   test1();
    MyString abc{"abcdef" };
    MyString abd("abcdef" );
    MyString(STRING(aab));
