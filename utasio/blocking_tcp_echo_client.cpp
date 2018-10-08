@@ -53,7 +53,7 @@ void call(int argc , char * argv[])
       std::cout << "\n";
       boost::system::error_code ignored_ec;
       s.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
-      sleep(10);
+      sleep(600);
     }
 
 }
