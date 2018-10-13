@@ -1,16 +1,13 @@
 #ifndef _NETDLL_NET_PDU_TYPE_H_
 #define _NETDLL_NET_PDU_TYPE_H_
-#include "baselib.h"
+	
+#include "ostypedef.h"
 
 #define	BUF_LENGTH_1K		1024
 #define	BUF_LENGTH_2K		2*1024
 #define	BUF_LENGTH_4K		4*1024
 #define	BUF_LENGTH_8K		8*1024
 #define	BUF_LENGTH_16K		16*1024
-#define	BUF_LENGTH_32K		32*1024
-#define	BUF_LENGTH_64K		64*1024
-#define	BUF_LENGTH_100K		100*1024
-#define	BUF_LENGTH_128K		128*1024
 
 
 

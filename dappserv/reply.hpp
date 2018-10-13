@@ -14,7 +14,7 @@
 #include <string>
 #include <vector>
 #include <boost/asio.hpp>
-#include "header.hpp"
+
 
 namespace dapp {
 namespace server2 {
@@ -38,8 +38,8 @@ struct reply
 
 };
 
-} // namespace server2
-} // namespace http
+} // namespace server
+} // namespace dapp
 
 #endif // DAPP_SERVER2_REPLY_HPP
 

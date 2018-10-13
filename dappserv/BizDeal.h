@@ -1,12 +1,16 @@
 #ifndef _MONITOR_CLI_TASK_BIZ_MANAGER_H_
 #define _MONITOR_CLI_TASK_BIZ_MANAGER_H_
-class  CTaskScan;
+
+#include "ostypedef.h"
+
+//class  CTaskScan;
 class  CBizDeal 
 {
 public:
 	CBizDeal();
+	~CBizDeal();
  
-	void         Init(CCliTask   * pTaskScan);
+	void         Init(/*CCliTask   * pTaskScan*/);
 	void         Run(BYTE*,int);
 
 	// 
@@ -16,7 +20,7 @@ public:
 	int          BeginReqExecCmd(char * szFile);
 	int          BeginReqScreen(char * szFile);
 private:
-	CCliTask   * m_pTaskScan;
+//	CCliTask   * m_pTaskScan;
 	void         ScanDir(char * context);
 	void         TransFile(char * context);
 	int          SendFailedPkg();

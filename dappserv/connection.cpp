@@ -11,15 +11,13 @@
 #include "connection.hpp"
 #include <vector>
 #include <boost/bind.hpp>
-#include "request_handler.hpp"
+#include "reply.hpp"
 
 namespace dapp {
 namespace server2 {
 
-connection::connection(boost::asio::io_context& io_context,
-    request_handler& handler)
-  : socket_(io_context),
-    request_handler_(handler)
+connection::connection(boost::asio::io_context& io_context)
+  : socket_(io_context)
 {
 }
 
@@ -86,7 +84,7 @@ void connection::handle_read(const boost::system::error_code& e,std::size_t byte
   if (!e)
   {
 
-	int  ret = splitPkt_.DealConnectData(buffer_.data(),   bytes_transferred);
+	int  ret = splitPkt_.DealConnectData((BYTE*) buffer_.data(),   bytes_transferred);
 	
 	
 	if (ret==2 ) //success 
@@ -98,7 +96,7 @@ void connection::handle_read(const boost::system::error_code& e,std::size_t byte
 	}
 	else if (ret==0) // error 
 	{
-	  reply_ = reply::stock_reply(reply::bad_request);
+	  //reply_ = reply::stock_reply(reply::bad_request);
 	  boost::asio::async_write(socket_, reply_.to_buffers(),
 		  boost::bind(&connection::handle_write, shared_from_this(),
 			boost::asio::placeholders::error));
@@ -122,7 +120,6 @@ void connection::handle_read(const boost::system::error_code& e,std::size_t byte
 
 void connection::write( )
 {
-		
 	boost::asio::async_write(socket_, reply_.to_buffers(),
 			boost::bind(&connection::handle_write, shared_from_this(),
 			  boost::asio::placeholders::error));

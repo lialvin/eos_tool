@@ -26,7 +26,7 @@ set(EXECUTABLE_OUTPUT_PATH  ${PROJECT_BINARY_DIR}/bin)
 
 set(IMPORTLIB 
   pthread  boost_system boost_filesystem  
-  boost_thread boost_thread   m
+  boost_thread m
   boost_log_setup  boost_log
 )
 

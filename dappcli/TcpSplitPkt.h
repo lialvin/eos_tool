@@ -25,6 +25,8 @@ private:
 	int                       m_nLeftLen;
 public:
 
+        CTcpSplitPkt();
+        ~CTcpSplitPkt();
     
    
 	int    DealConnectData( BYTE * pData, int nDataSize  );

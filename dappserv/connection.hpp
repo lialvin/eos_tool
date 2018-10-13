@@ -17,9 +17,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include "reply.hpp"
-#include "request.hpp"
-#include "request_handler.hpp"
-#include "request_parser.hpp"
+#include "TcpSplitPkt.h"
 
 namespace dapp {
 namespace server2 {
@@ -31,14 +29,14 @@ class connection
 {
 public:
   /// Construct a connection with the given io_context.
-  explicit connection(boost::asio::io_context& io_context,
-      request_handler& handler);
+  explicit connection(boost::asio::io_context& io_context );
 
   /// Get the socket associated with the connection.
   boost::asio::ip::tcp::socket& socket();
 
   /// Start the first asynchronous operation for the connection.
   void start();
+  void write( );
 
 private:
   /// Handle completion of a read operation.
@@ -66,7 +64,7 @@ private:
   ///request_parser request_parser_;
 
   /// The reply to be sent back to the client.
-  ///reply reply_;
+  reply reply_;
 };
 
 typedef boost::shared_ptr<connection> connection_ptr;

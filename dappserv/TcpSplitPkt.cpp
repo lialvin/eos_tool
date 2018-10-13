@@ -1,41 +1,49 @@
  
 #include "TcpSplitPkt.h"
+#include "netpdu.h"
+#include "string.h"
 
 
-
-CTcpSplitPkt::CTcpSplitPkt(  ): messageCallback_(cb) 
+CTcpSplitPkt::CTcpSplitPkt( )  
 {
-	m_pTcpBuf = new BYTE[RECV_SPLI_BUF_SIZE];
-	m_nLeftLen = 0;
+    m_pTcpBuf = new BYTE[RECV_SPLI_BUF_SIZE];
+    m_nLeftLen = 0;
 }
+
+CTcpSplitPkt::~CTcpSplitPkt( )  
+{
+   delete [] m_pTcpBuf;
+   m_nLeftLen=0;
+}
+
 
 void    CTcpSplitPkt::SplitPkt(BYTE*&  pBuf  , int & nDataSize )
 {
 	
-	NET_PKG_HEAD * pPack = (NET_PKG_HEAD *) pBuf;
+    NET_PKG_HEAD * pPack = (NET_PKG_HEAD *) pBuf;
 	
-	Decode(pBuf ,pPack->nPackageLength );
+    Decode(pBuf ,pPack->nPackageLength );
 	
-	pBuf+= pPack->nPackageLength;
-	nDataSize -= pPack->nPackageLength;
+    pBuf+= pPack->nPackageLength;
+    nDataSize -= pPack->nPackageLength;
 	
 }	
 
 void    CTcpSplitPkt::Decode(BYTE * pBuf ,int nPktLen )
 {
     //m_pSplitObj->DealCliPkt(pBuf,nPktLen); 
-    request_handler_.handle_request(request_, reply_);
+    //request_handler_.handle_request(request_, reply_);
 	
 }
 
 bool  CTcpSplitPkt::IsFullPkg(BYTE *& pReadPos,int & nReadLen)
 {
-	NET_PKG_HEAD * pPack;
-	while(nReadLen > 4) // 
+    NET_PKG_HEAD * pPack;
+    while(nReadLen > 4) // 
+    {
+	if(CHECK_HEAD_FLAG(pReadPos)  )
 	{
-		if(CHECK_HEAD_FLAG(pReadPos)  )
-		{
-			pPack = (NET_PKG_HEAD *) pReadPos;
+            pPack = (NET_PKG_HEAD *) pReadPos;
 			if( nReadLen  < sizeof(NET_PKG_HEAD))
 			{
 				return false;
@@ -69,8 +77,8 @@ int  CTcpSplitPkt::DealConnectData(  BYTE * pData, int nDataSize  )
 	
 	BYTE*  pReadPos = NULL;	
 	BYTE * pTcpBuf = m_pTcpBuf;
-	int ret = 1;
-	nRetLen= nDataSize;
+	int    ret = 1;
+	int    nRetLen= nDataSize;
 	if(nRetLen == 0)
 	{	
 		return 0;

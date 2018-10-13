@@ -3,8 +3,10 @@
 #include  <time.h>
 #include  "BizDeal.h"
 #include  "netpdu.h"
-
- 
+#include  "stdlib.h"
+#include  <string.h> 
+#include  <string> 
+#include  <vector> 
 
 CBizDeal::CBizDeal()
 {	
@@ -12,9 +14,9 @@ CBizDeal::CBizDeal()
 	m_pFileName=NULL;
 }
 
-void  CBizDeal::Init(CCliTask   * pTaskScan)
+void  CBizDeal::Init()
 {
-	m_pTaskScan = pTaskScan;
+	//m_pTaskScan = pTaskScan;
 	m_pSendBuf = new BYTE[64 * 1024];
 	SET_HEAD_FLAG(m_pSendBuf);
 	m_pFileName = new char[1024];
@@ -106,8 +108,8 @@ void CBizDeal::ScanDir(char * context)
 	int nLen = 0;
 	std::string strBuff;
 	std::vector<std::string> namevect;
-	
-	FindFilesInFloder(context, NULL, namevect, 3, FALSE/* = TRUE */); /*目录没加进去  */
+/*
+	FindFilesInFloder(context, NULL, namevect, 3, FALSE); 
 	std::vector<std::string>::iterator it;
 	
 	for (it = namevect.begin(); it != namevect.end(); it++)
@@ -123,12 +125,13 @@ void CBizDeal::ScanDir(char * context)
 	pScanResp->dataLen =(WORD) strBuff.length();
 	strncpy(pScanResp->context, strBuff.c_str(),strBuff.length());	
 	pSendHead->nPackageLength = sizeof(NET_PKG_HEAD)+ sizeof(FILE_SCAN_STRU)-8 + strBuff.length();
-	m_pTaskScan->SendCxt(m_pSendBuf, pSendHead->nPackageLength);
+       */
+	//m_pTaskScan->SendCxt(m_pSendBuf, pSendHead->nPackageLength);
 }
 
 void CBizDeal::TransFile(char * context)
 {
-	if (IsFileExist(context)==FALSE) /*  */
+	/*if (IsFileExist(context)==FALSE) 
 	{
 		SendFailedPkg();
 		return ;
@@ -137,7 +140,7 @@ void CBizDeal::TransFile(char * context)
 	if (SendBinFile(context) == false)
 	{
 		SendFailedPkg();
-	}
+	}*/
 	return;
  
 
@@ -145,13 +148,13 @@ void CBizDeal::TransFile(char * context)
 // 
 bool CBizDeal::SendBinFile(  const char * szOrigFile)
 {
-
+	bool bRet = true;
+/*
 	if (szOrigFile == NULL)
 	{
 		return false;
 	}
 	BYTE  flag = 0x1;
-	bool bRet = true;
 	int  nReadLen;
 	char szBuf[16 * 1024] = { 0 };
 	std::ifstream fin(szOrigFile, std::ios::binary);
@@ -174,7 +177,7 @@ bool CBizDeal::SendBinFile(  const char * szOrigFile)
 	}
 
 	fin.close();
-	
+*/	
 	return bRet;
 }
 //
@@ -190,7 +193,7 @@ void CBizDeal::SendCmdPkg(int nCmdType, WORD flag, BYTE * pBuf, int nLen,const c
 		memcpy(pScanResp->context, pBuf, nLen);
 	pSendHead->nPackageLength = sizeof(NET_PKG_HEAD) + sizeof(FILE_SCAN_STRU) - 4 + nLen;
 
-	m_pTaskScan->SendCxt(m_pSendBuf, pSendHead->nPackageLength);
+	//m_pTaskScan->SendCxt(m_pSendBuf, pSendHead->nPackageLength);
 }
 
 bool CBizDeal::RecvDirFile(char * szDestFile, WORD flag, BYTE * pBuf, int nLen)
@@ -199,17 +202,18 @@ bool CBizDeal::RecvDirFile(char * szDestFile, WORD flag, BYTE * pBuf, int nLen)
  	
 	bool bRet = true;
 	
-	std::ofstream fout(m_szTranFile, std::ios::binary | std::ios::ate | std::ios::out);// 新建的打开方式
+	/*std::ofstream fout(m_szTranFile, std::ios::binary | std::ios::ate | std::ios::out);// 
 	fout.write((char*)pBuf, nLen);	
 	fout.close();
-
+*/
 	return bRet;
 }
 //
 bool CBizDeal::RecvBinFile(char * szDestFile, WORD flag, BYTE * pBuf, int nLen)
 {
+	bool bRet = true;
 	
-	static std::ofstream fout;
+/*	static std::ofstream fout;
 	
 	if (flag == 0x1)
 	{
@@ -222,7 +226,6 @@ bool CBizDeal::RecvBinFile(char * szDestFile, WORD flag, BYTE * pBuf, int nLen)
 		fout.open(m_szTranFile, std::ios::binary | std::ios::ate | std::ios::out);
 	}
 	
-	bool bRet = true;
 
 	//std::ofstream fout(m_szTranFile, std::ios::binary | std::ios::app);
 	 
@@ -244,7 +247,7 @@ bool CBizDeal::RecvBinFile(char * szDestFile, WORD flag, BYTE * pBuf, int nLen)
 			fout.write((char*)pBuf, nLen);
 		fout.close();
 	}	 	 
-	
+*/	
 	return bRet;
 }
 
@@ -255,7 +258,7 @@ int  CBizDeal::SendFailedPkg()
 	SCAN_FILE_RESP_STRU   * pScanResp = (SCAN_FILE_RESP_STRU   *)pSendHead->u.szData;
 	pScanResp->cmdtype = CMD_REQ_FAILED;
 	pSendHead->nPackageLength = sizeof(NET_PKG_HEAD) + sizeof(SCAN_FILE_RESP_STRU) - 4;
-	return  m_pTaskScan->SendCxt(m_pSendBuf, pSendHead->nPackageLength);
+	return 0; // m_pTaskScan->SendCxt(m_pSendBuf, pSendHead->nPackageLength);
 }
 //
 int  CBizDeal::BeginReqFile(char * szFile)
@@ -270,7 +273,7 @@ int  CBizDeal::BeginReqFile(char * szFile)
 	char * pos = strrchr(szFile, '\\');
 	strcat(m_szTranFile,pos+1 );
 	pSendHead->nPackageLength = sizeof(NET_PKG_HEAD) + sizeof(FILE_SCAN_STRU) - 4 + strlen(szFile);
-	return  m_pTaskScan->SendCxt(m_pSendBuf, pSendHead->nPackageLength);
+	return  0;// m_pTaskScan->SendCxt(m_pSendBuf, pSendHead->nPackageLength);
 }
 //
 int  CBizDeal::BeginReqDir(char * szFile)
@@ -282,7 +285,7 @@ int  CBizDeal::BeginReqDir(char * szFile)
 	pScanResp->dataLen = (WORD)strlen(szFile);
 	strcpy(pScanResp->context, szFile);
 	pSendHead->nPackageLength = sizeof(NET_PKG_HEAD) + sizeof(FILE_SCAN_STRU) - 4 + strlen(szFile);
-	return m_pTaskScan->SendCxt(m_pSendBuf, pSendHead->nPackageLength);
+	return 0;//m_pTaskScan->SendCxt(m_pSendBuf, pSendHead->nPackageLength);
 }
 
 int  CBizDeal::BeginReqExecCmd(char * szFile)
@@ -294,7 +297,7 @@ int  CBizDeal::BeginReqExecCmd(char * szFile)
 	pScanResp->dataLen = (WORD)strlen(szFile);
 	strcpy(pScanResp->context, szFile);
 	pSendHead->nPackageLength = sizeof(NET_PKG_HEAD) + sizeof(FILE_SCAN_STRU) - 4 + strlen(szFile);
-	return  m_pTaskScan->SendCxt(m_pSendBuf, pSendHead->nPackageLength);
+	return  0;//m_pTaskScan->SendCxt(m_pSendBuf, pSendHead->nPackageLength);
 }
 int  CBizDeal::BeginReqScreen(char * szFile)
 {
@@ -305,7 +308,7 @@ int  CBizDeal::BeginReqScreen(char * szFile)
 	pScanResp->dataLen = (WORD)strlen(szFile);
 	strcpy(pScanResp->context, szFile);
 	pSendHead->nPackageLength = sizeof(NET_PKG_HEAD) + sizeof(FILE_SCAN_STRU) - 4 + strlen(szFile);
-	return  m_pTaskScan->SendCxt(m_pSendBuf, pSendHead->nPackageLength);
+	return  0;//m_pTaskScan->SendCxt(m_pSendBuf, pSendHead->nPackageLength);
 }
 
 void   CBizDeal::RecvCmdScreenReq(WORD flag, BYTE * pBuf, int nLen)

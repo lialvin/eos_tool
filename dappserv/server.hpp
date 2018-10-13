@@ -20,7 +20,7 @@
 #include "io_context_pool.hpp"
 #include "request_handler.hpp"
 
-namespace http {
+namespace dapp {
 namespace server2 {
 
 /// The top-level class of the HTTP server.
@@ -62,6 +62,6 @@ private:
 };
 
 } // namespace server2
-} // namespace http
+} // namespace dapp
 
-#endif // HTTP_SERVER2_SERVER_HPP
+#endif // DAPP_SERVER2_SERVER_HPP

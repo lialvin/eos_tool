@@ -11,7 +11,7 @@
 #include "server.hpp"
 #include <boost/bind.hpp>
 
-namespace http {
+namespace dapp {
 namespace server2 {
 
 server::server(const std::string& address, const std::string& port,
@@ -51,7 +51,9 @@ void server::run()
 void server::start_accept()
 {
   new_connection_.reset(new connection(
-        io_context_pool_.get_io_context(), request_handler_));
+        io_context_pool_.get_io_context()));
+  //      io_context_pool_.get_io_context(), request_handler_));
+  
   acceptor_.async_accept(new_connection_->socket(),
       boost::bind(&server::handle_accept, this,
         boost::asio::placeholders::error));
