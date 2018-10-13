@@ -33,6 +33,7 @@ void    CTcpSplitPkt::Decode(BYTE * pBuf ,int nPktLen )
 {
     //m_pSplitObj->DealCliPkt(pBuf,nPktLen); 
     //request_handler_.handle_request(request_, reply_);
+    datahandlefun_(pBuf,nPktLen);
 	
 }
 

@@ -22,6 +22,8 @@ connection::connection(boost::asio::ip::tcp::socket socket,connection_manager& m
   : socket_(std::move(socket)),   connection_manager_(manager)
 
 {
+   splitPkt_.datahandlefun_= std::bind(&connection::request_handle, this, std::placeholders::_1, std::placeholders::_2); 
+ //FuncIntInt = std::bind(&Functor::set_intint, test, std::placeholders::_1, std::placeholders::_2);
 }
 
 void connection::start()
@@ -43,21 +45,19 @@ void connection::do_read()
 		
         if (!ec)
         {
-
-	   int  ret = splitPkt_.DealConnectData((BYTE*)buffer_.data(),   bytes_transferred);
+            int  ret = splitPkt_.DealConnectData((BYTE*)buffer_.data(),   bytes_transferred);
 				
 			if (ret==2 ) //success 
 			{
 				//request_handler_.handle_request(request_, reply_);
-				do_write();
+				//do_write();
 			  
 			}
 			else if (ret==0) // error 
 			{
 	
-  			 // request_handler_.handle_request(request_, reply_);
-			  do_write();
-
+  			   // request_handler_.handle_request(request_, reply_);
+			   // do_write();
 					
 			}
 			
@@ -75,6 +75,13 @@ void connection::do_read()
       });
 }
 
+int   connection::request_handle( unsigned char * pData, int  pkglen)
+{
+    request_handler_.handle_request(pData, pkglen , reply_);
+
+    do_write();
+}
+ 
 void connection::do_write()
 {
      auto self(shared_from_this());

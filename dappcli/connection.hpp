@@ -16,6 +16,7 @@
 #include <boost/asio.hpp>
 #include "TcpSplitPkt.h"
 #include "reply.hpp"
+#include "request_handler.hpp"
 
 namespace dapp {
 namespace server {
@@ -34,10 +35,11 @@ public:
   explicit connection(boost::asio::ip::tcp::socket socket, connection_manager& manager);
 
   /// Start the first asynchronous operation for the connection.
-  void start();
+  void  start();
 
   /// Stop all asynchronous operations associated with the connection.
-  void stop();
+  void  stop();
+  int   request_handle( unsigned char * pData,int pktlen);
 
 private:
   /// Perform an asynchronous read operation.
@@ -51,7 +53,8 @@ private:
 
   /// The manager for this connection.
   connection_manager& connection_manager_;
-
+   
+  request_handler  request_handler_;
 
   /// Buffer for incoming data.
   std::array<char, 8192> buffer_;

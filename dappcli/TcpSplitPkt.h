@@ -3,6 +3,7 @@
 
 #include "ostypedef.h"
 #include <string>
+#include <functional>
 
 #define   RECV_SPLI_BUF_SIZE    64*1024
 #define   RECV_HALF_SIZE    32*1024   //RECV_BUF_SIZE   half length
@@ -30,6 +31,8 @@ public:
     
    
 	int    DealConnectData( BYTE * pData, int nDataSize  );
+    
+    std::function< int(unsigned char *,int )> datahandlefun_;
 		
 	int                 m_iIdx;
 protected:

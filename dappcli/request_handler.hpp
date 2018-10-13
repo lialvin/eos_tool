@@ -3,9 +3,10 @@
 
 #include <string>
 #include <boost/noncopyable.hpp>
+#include "reply.hpp"
 
 namespace dapp{
-namespace server3 {
+namespace server {
 
 class request_handler
   : private boost::noncopyable
@@ -15,13 +16,14 @@ public:
   explicit request_handler(){};
 
   /// Handle a request and produce a reply.
-  void handle_request(std::string & req, std::string& rep){};
+  void handle_request(unsigned char *  req, int len, reply & replyobj ){};
+
 
 private:
 
 };
 
-} // namespace server3
+} // namespace server
 } // namespace dapp
 
 #endif // DAPP_SERVER3_REQUEST_HANDLER_HPP
