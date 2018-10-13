@@ -6,6 +6,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <functional>
+
 
 using namespace std;
 
@@ -14,9 +16,48 @@ int   readstrfiletohex( char *pinfile, char * poutfile  );
 
 int   readbintohex( char *pinfile, char * poutfile  );
 
+
+class CTestA
+{
+public:
+   CTestA(){};
+   ~CTestA(){};
+   
+   int fun(int a,int b)
+   { 
+     //cout<<a<<b<<endl;
+   
+   }
+   std::function< int(int ,int )> datahandlefun_;
+
+};
+
+
+class CTest
+{
+public:
+   CTest(){
+        //aaa.datahandlefun_= std::bind(&CTest::fun, *this, std::placeholders::_1, std::placeholders::_2);
+        aaa.datahandlefun_= std::bind(&CTest::fun, this, std::placeholders::_1, std::placeholders::_2);
+    }
+   ~CTest(){};
+
+   int fun(int a,int b) 
+   {
+     cout<<a<<"==a            b=="<<b<<endl;
+
+   }
+   CTestA  aaa;
+};
+
+
 int main(int argc, char* argv[])
 {
 
+
+   CTest  bb;
+   bb.aaa.datahandlefun_(1121,121);
+   
    string  dbuser , dbpass;
  
    char * p; 
