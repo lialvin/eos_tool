@@ -5,62 +5,29 @@
 #include "testmain.h"
 #include <boost/format.hpp>
 
-
-void print()
-{
-   cout << "empty" << endl;
-}
-template <class T, class ...Args>
-void print(T head, Args... rest)
-{
-   cout << "parameter " << head << endl;
-      print(rest...);
-}
-
-void test1()
-{
-  std::map<char,int> mymap;
-  std::map<char,int>::iterator it;
-
-  // insert some values:
-  mymap['a']=10;
-  mymap['b']=20;
-  mymap['c']=30;
-  mymap['d']=40;
-  mymap['e']=50;
-  mymap['f']=60;
-
-  it=mymap.find('b');
-  mymap.erase (it);                   // erasing by iterator
-  int a = it->second;
-  a = it->second;
-  it=mymap.find('c');
-
-  a = it->second;
-  
-  mymap.erase ('c');                  // erasing by key
-
-  it++;
-
-  a = it->second;
-
-  it=mymap.find ('e');
-  mymap.erase ( it, mymap.end() );    // erasing by range
-
-  // show content:
-  for (it=mymap.begin(); it!=mymap.end(); ++it)
-    std::cout << it->first << " => " << it->second << '\n';
-
-}
 #define STRING(x)  #x#x#x
 #define TEXT(x)  "class"#x"Info"
 #define CLASS_NAME(name) class##name
 
+template <class T> typename std::enable_if<std::is_integral<T>::value,bool>::type
+   is_odd (T i) {return bool(i%2);}
+
+
+template < class T,  class = typename std::enable_if<std::is_integral<T>::value>::type>
+   bool is_even (T i) {return !bool(i%2);}
+
 int main(int argc, char* argv[])
 {
 
+   short int i = 1;    // code does not compile if type of i is not integral
+   double  aa = 0; 
+   std::cout << std::boolalpha;
+   std::cout << "i is odd: " << is_odd(i) << std::endl;
+   std::cout << "i is even: " << is_even(i) << std::endl;
+  // std::cout << "i is char: " << is_even(aa) << std::endl;
+
    int aab=100;
-   test1();
+
    MyString abc{"abcdef" };
    MyString abd("abcdef" );
    MyString(STRING(aab));
@@ -106,7 +73,6 @@ int main(int argc, char* argv[])
    char szBuf[128];
    sprintf(szBuf  ,"a is %lf,b is %lf\n" , a,b);
     
-   print(1,23,3.5,"abcd");   
 
    return 0;
 }
