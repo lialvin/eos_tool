@@ -11,10 +11,10 @@
 
 template <class T> typename std::enable_if<std::is_integral<T>::value,bool>::type
    is_odd (T i) {return bool(i%2);}
-
-
 template < class T,  class = typename std::enable_if<std::is_integral<T>::value>::type>
    bool is_even (T i) {return !bool(i%2);}
+
+
 
 int main(int argc, char* argv[])
 {
