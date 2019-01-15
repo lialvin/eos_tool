@@ -23,7 +23,7 @@ set(IMPORTLIB
    boost_filesystem
 )
 
-add_executable(uos_moni_server  uos_moni_server.cpp)
+add_executable(uos_moni_server  uos_main.cpp)
 target_link_libraries(uos_moni_server ${IMPORTLIB})
 
 add_executable(uos_moni_cli  uos_moni_cli.cpp)

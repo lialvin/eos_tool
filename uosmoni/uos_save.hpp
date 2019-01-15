@@ -37,15 +37,15 @@ public:
         if (count_ < 10) {
             std::cout << "Timer 2: " << count_ << std::endl;
             ++count_;
-            timer2_.expires_at(timer2_.expiry() + boost::asio::chrono::seconds(1));
+            timer2_.expires_at(timer2_.expiry() + boost::asio::chrono::seconds(6));
             timer2_.async_wait(boost::asio::bind_executor(strand_,boost::bind(&timeSave::onSave2,this)));
         }
     }
 	
-	void updateData(string  hostdata)
+	void updateData(std::string  hostdata)
 	{
 		int pos = hostdata.find("\n");
-		string keystr = hostdata.substr(0,pos);
+		std::string keystr = hostdata.substr(0,pos);
 		uosdata[keystr] = hostdata;
 	}
 	
@@ -55,12 +55,12 @@ private:
 	void  saveData()
 	{		
 	
-	    string strFile = "/home/qicity/aaa.txt";
-	    ofstream outfile(strFile.c_str());   
+	    std::string strFile = "/home/qicity/aaa.txt";
+	    std::ofstream outfile(strFile.c_str());   
    
 		for(auto iter = uosdata.begin(); iter != uosdata.end(); iter++)  			
 		{	
-			outfile<< iter->second << endl;
+			outfile<< iter->second << std::endl;
 			//cout<<iter->first<<' '<<iter->second<<endl;   
 		}	
 		
@@ -69,7 +69,7 @@ private:
 		uosdata.erase( uosdata.begin(), uosdata.end() );  
 	}
 	
-	std::map<string,string> uosdata;
+	std::map<std::string,std::string> uosdata;
 	
     boost::asio::steady_timer timer1_;
     boost::asio::steady_timer timer2_;
@@ -77,6 +77,7 @@ private:
     boost::asio::io_context::strand strand_;
 };
  
+timeSave  * g_uosSave;
 
 #endif //DAPPCLI_TIME_SAVE_HPP
 

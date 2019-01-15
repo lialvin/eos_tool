@@ -18,6 +18,7 @@ enum { max_length = 10240 };
 
 void call(int argc , char * argv[]);
 void  printflow( std::time_t &  old_value, size_t reply_length, size_t & total_len );
+
 std::vector<std::string> read_uos();
 
 int main(int argc, char* argv[])
@@ -46,7 +47,7 @@ std::vector<std::string> read_uos()
     while (c.running() && std::getline(is, line) && !line.empty())
     {
         data.push_back(line);
-        std::cout<<"std::cout "<< line<< std::endl; 
+//        std::cout<<"std::cout "<< line<< std::endl; 
     }
     c.wait();
 
@@ -56,7 +57,7 @@ std::vector<std::string> read_uos()
 
 /*
 */
-void sndfun(tcp::socket   & s,char*  buf, size_t buflen) //拷贝构造函数  
+void sndfun(tcp::socket   & s,const char*  buf, size_t buflen) //拷贝构造函数  
 {  
     boost::asio::write(s, boost::asio::buffer(buf, buflen ));
     //std::this_thread::sleep_for(std::chrono::milliseconds(10));  
@@ -65,17 +66,18 @@ void sndfun(tcp::socket   & s,char*  buf, size_t buflen) //拷贝构造函数
 /*
 
 */
-size_t   collectdata( char * buf , size_t  buflen)
+size_t   collectdata( std::string & nodeinfo, size_t  buflen)
 {
     size_t  data_len=0;
     std::vector<std::string> str_vec;
     str_vec= read_uos();
     for(auto it :str_vec)
     {
-       if(data_len<buflen-it.length())
-       {
-         strcpy(buf,it.data());
-         data_len+=it.length(); 
+       if(data_len< buflen-it.length()) 
+       { 
+          nodeinfo+=it; 
+          nodeinfo+="\n"; 
+          data_len+=it.length(); 
        }
     }
     return  data_len; 
@@ -85,7 +87,7 @@ void call(int argc , char * argv[])
 {
     boost::asio::io_context io_context;
    
-    char request[2028]={"strlen"};
+    char request[2028]={""};
 
     char reply[max_length];
 
@@ -103,8 +105,9 @@ void call(int argc , char * argv[])
      size_t total_len=0;
  
      //std::thread t3(sndfun, std::ref(s)); //引用  
-     size_t datalen= collectdata(request, 2000);
-     sndfun(s, request,datalen);
+     std::string strinfo; 
+     size_t datalen= collectdata(strinfo, 2000);
+     sndfun(s, strinfo.data(),datalen);
      
      /*while(1) 
      {
@@ -115,7 +118,7 @@ void call(int argc , char * argv[])
       sleep(1);
       boost::system::error_code ignored_ec;
       s.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
-      sleep(5);
+      sleep(2);
     }
 }
 

@@ -18,6 +18,7 @@
 #include <boost/log/sources/record_ostream.hpp>
 
 #include "uos_server.hpp"
+#include "uos_save.hpp"
 
 using namespace std;
 
@@ -84,17 +85,16 @@ int main(int argc, char* argv[])
     uselog();
     if (argc != 2)
     {
-      std::cerr << "Usage: async_tcp_echo_server <port>\n";
-      return 1;
+       std::cerr << "Usage: async_tcp_echo_server <port>\n";
+       return 1;
     }
 
     boost::asio::io_context io_context(1);
 
-    // 定时器
     int count = 0;
-    dapp::server::tcpClient  pcli(io_context);
-
-    server s(io_context, std::atoi(argv[1]));
+    timeSave  tiSave(io_context);
+    g_uosSave = &tiSave;
+    server s(io_context, std::atoi(argv[1]) );
 
     io_context.run();
   }

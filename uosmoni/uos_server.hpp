@@ -1,3 +1,7 @@
+#ifndef UOS_MONI_SERVER_HPP
+#define UOS_MONI_SERVER_HPP
+
+#include  "uos_save.hpp"
 
 using boost::asio::ip::tcp;
 
@@ -36,9 +40,10 @@ private:
   {
     
     std::string retstr("recv:once");
-
+  
     auto self(shared_from_this());
-
+    std::string nodestr(data_,length);    
+    g_uosSave->updateData(nodestr );
     boost::asio::async_write(socket_, boost::asio::buffer(retstr.data(), retstr.length()),
         [this, self](boost::system::error_code ec, std::size_t /*length*/)
         {
@@ -51,6 +56,7 @@ private:
   }
 
   tcp::socket socket_;
+  
   enum { max_length = 3024 };
   char data_[max_length];
 };
@@ -81,3 +87,5 @@ private:
 
   tcp::acceptor acceptor_;
 };
+
+#endif
