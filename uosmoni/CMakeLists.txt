@@ -20,11 +20,12 @@ set(IMPORTLIB
    boost_log_setup
    boost_log
    boost_thread
+   boost_filesystem
 )
 
-add_executable(async_server  async_tcp_echo_server.cpp)
-target_link_libraries(async_server ${IMPORTLIB})
+add_executable(uos_moni_server  uos_moni_server.cpp)
+target_link_libraries(uos_moni_server ${IMPORTLIB})
 
-add_executable(tcp_client  blocking_tcp_echo_client.cpp)
-target_link_libraries(tcp_client  ${IMPORTLIB})
+add_executable(uos_moni_cli  uos_moni_cli.cpp)
+target_link_libraries(uos_moni_cli  ${IMPORTLIB})
 

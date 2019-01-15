@@ -1,11 +1,6 @@
 //
-// blocking_tcp_echo_client.cpp
+// uos_moni_cli.cpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-// Copyright (c) 2003-2017 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
 #include <cstdlib>
@@ -14,6 +9,8 @@
 #include <boost/asio.hpp>
 #include <thread> 
 #include<chrono>  
+#include <boost/filesystem.hpp>
+#include <boost/process.hpp>
 
 using boost::asio::ip::tcp;
 
@@ -21,6 +18,7 @@ enum { max_length = 10240 };
 
 void call(int argc , char * argv[]);
 void  printflow( std::time_t &  old_value, size_t reply_length, size_t & total_len );
+std::vector<std::string> read_uos();
 
 int main(int argc, char* argv[])
 {
@@ -32,38 +30,62 @@ int main(int argc, char* argv[])
     call(argc,argv);
 }
 
+namespace bp = ::boost::process;
+
+std::vector<std::string> read_uos()
+{
+    std::cout<<"std::cout read uos  "<< std::endl; 
+    std::vector<std::string> data;
+    std::string line;
+
+    bp::ipstream is; //reading pipe-stream
+    //bp::child c(bp::search_path("cluos"),"-u","http://10.186.11.220:9008", "get", "info",   bp::std_out > is);
+    bp::child c(bp::search_path("sh"), "/home/qicity/bin/shuos.sh",   bp::std_out > is);
+    //bp::child c(bp::search_path("gcc"),"-v",  bp::std_err >is);
+    
+    while (c.running() && std::getline(is, line) && !line.empty())
+    {
+        data.push_back(line);
+        std::cout<<"std::cout "<< line<< std::endl; 
+    }
+    c.wait();
+
+    return data;
+
+} 
+
 /*
 */
-void sndfun(tcp::socket   & s) //拷贝构造函数  
+void sndfun(tcp::socket   & s,char*  buf, size_t buflen) //拷贝构造函数  
 {  
-    std::cout << "Thread " <<  " executing\n";  
-    //this_thread::sleep_for(chrono::milliseconds(10));  
+    boost::asio::write(s, boost::asio::buffer(buf, buflen ));
+    //std::this_thread::sleep_for(std::chrono::milliseconds(10));  
+}
 
-    char request[1028]={"strlen"};
-    for(int i=0;i<100;i++)
+/*
+
+*/
+size_t   collectdata( char * buf , size_t  buflen)
+{
+    size_t  data_len=0;
+    std::vector<std::string> str_vec;
+    str_vec= read_uos();
+    for(auto it :str_vec)
     {
-       strcat(request,"higklmnopq");
+       if(data_len<buflen-it.length())
+       {
+         strcpy(buf,it.data());
+         data_len+=it.length(); 
+       }
     }
-    
-    size_t request_length = std::strlen(request);
-
-    while(1)
-    {
-       boost::asio::write(s, boost::asio::buffer(request, request_length));
-       std::this_thread::sleep_for(std::chrono::milliseconds(10));  
-    }    
-    std::cout << "Thread finished " <<  " executing\n";  
+    return  data_len; 
 }
 
 void call(int argc , char * argv[])
 {
     boost::asio::io_context io_context;
    
-    char request[1028]={"strlen"};
-    for(int i=0;i<100;i++)
-    {
-       strcat(request,"higklmnopq"); 
-    }
+    char request[2028]={"strlen"};
 
     char reply[max_length];
 
@@ -73,33 +95,27 @@ void call(int argc , char * argv[])
       tcp::resolver resolver(io_context);
       boost::asio::connect(s, resolver.resolve(argv[1], argv[2]));
 
-      // std::cout << "Enter message: ";
-      //  char request[1025max_length]={"send msg"};
-      // std::cin.getline(request, max_length);
 
        std::chrono::time_point<std::chrono::high_resolution_clock, std::chrono::duration<int, std::ratio<1>>> now_secondlevel = std::chrono::time_point_cast<std::chrono::duration<int, std::ratio<1>>>(std::chrono::high_resolution_clock::now());
       std::time_t  ut_second = std::chrono::high_resolution_clock::to_time_t(now_secondlevel);      
 
      size_t reply_length =0;
      size_t total_len=0;
-
-     std::thread t3(sndfun, std::ref(s)); //引用  
+ 
+     //std::thread t3(sndfun, std::ref(s)); //引用  
+     size_t datalen= collectdata(request, 2000);
+     sndfun(s, request,datalen);
+     
      /*while(1) 
      {
-      //   size_t request_length = std::strlen(request);
-      //   boost::asio::write(s, boost::asio::buffer(request, request_length));
-
-         reply_length = boost::asio::read(s,
-                             boost::asio::buffer(reply, max_length));
-
-         //std::cout<<"Reply length = "<< reply_length<<std::endl;
-
+         reply_length = boost::asio::read(s,boost::asio::buffer(reply, max_length));
          printflow(ut_second, reply_length, total_len );
       }*/ 
 
+      sleep(1);
       boost::system::error_code ignored_ec;
       s.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
-      sleep(1);
+      sleep(5);
     }
 }
 
