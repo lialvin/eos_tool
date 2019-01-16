@@ -11,7 +11,8 @@
 
 class timeSave {
 public:
-    timeSave(boost::asio::io_context& io) :strand_(io),
+    timeSave(boost::asio::io_context& io,std::string file) :strand_(io),
+    save_file(file),
     timer1_(io,boost::asio::chrono::seconds(1)),
 	timer2_(io,boost::asio::chrono::seconds(1)),
 	count_(0)
@@ -55,7 +56,7 @@ private:
 	void  saveData()
 	{		
 	
-	    std::string strFile = "/home/qicity/aaa.txt";
+	    std::string strFile = save_file;
 	    std::ofstream outfile(strFile.c_str());   
    
 		for(auto iter = uosdata.begin(); iter != uosdata.end(); iter++)  			
@@ -68,7 +69,7 @@ private:
 		
 		uosdata.erase( uosdata.begin(), uosdata.end() );  
 	}
-	
+    std::string save_file;	
 	std::map<std::string,std::string> uosdata;
 	
     boost::asio::steady_timer timer1_;

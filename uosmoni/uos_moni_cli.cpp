@@ -19,13 +19,13 @@ enum { max_length = 10240 };
 void call(int argc , char * argv[]);
 void  printflow( std::time_t &  old_value, size_t reply_length, size_t & total_len );
 
-std::vector<std::string> read_uos();
+std::vector<std::string> read_uos(std::string filestr);
 
 int main(int argc, char* argv[])
 {
-    if (argc != 3)
+    if (argc != 4)
     {
-      std::cerr << "Usage: tcp_client <host> <port>\n";
+      std::cerr << "Usage: tcp_client <host> <port>  <script_file>\n";
       return 1;
     }
     call(argc,argv);
@@ -33,15 +33,15 @@ int main(int argc, char* argv[])
 
 namespace bp = ::boost::process;
 
-std::vector<std::string> read_uos()
+std::vector<std::string> read_uos(std::string filestr)
 {
-    std::cout<<"std::cout read uos  "<< std::endl; 
+    //std::cout<<"std::cout read uos  "<< std::endl; 
     std::vector<std::string> data;
     std::string line;
 
     bp::ipstream is; //reading pipe-stream
     //bp::child c(bp::search_path("cluos"),"-u","http://10.186.11.220:9008", "get", "info",   bp::std_out > is);
-    bp::child c(bp::search_path("sh"), "/home/qicity/bin/shuos.sh",   bp::std_out > is);
+    bp::child c(bp::search_path("sh"), filestr,   bp::std_out > is);
     //bp::child c(bp::search_path("gcc"),"-v",  bp::std_err >is);
     
     while (c.running() && std::getline(is, line) && !line.empty())
@@ -66,11 +66,11 @@ void sndfun(tcp::socket   & s,const char*  buf, size_t buflen) //拷贝构造函
 /*
 
 */
-size_t   collectdata( std::string & nodeinfo, size_t  buflen)
+size_t   collectdata( std::string & nodeinfo, size_t  buflen,std::string filestr)
 {
     size_t  data_len=0;
     std::vector<std::string> str_vec;
-    str_vec= read_uos();
+    str_vec= read_uos(filestr);
     for(auto it :str_vec)
     {
        if(data_len< buflen-it.length()) 
@@ -80,7 +80,8 @@ size_t   collectdata( std::string & nodeinfo, size_t  buflen)
           data_len+=it.length(); 
        }
     }
-    return  data_len; 
+
+    return  nodeinfo.length(); 
 }
 
 void call(int argc , char * argv[])
@@ -90,6 +91,7 @@ void call(int argc , char * argv[])
     char request[2028]={""};
 
     char reply[max_length];
+    std::string filestr(argv[3]);
 
     while(1)
     {
@@ -106,7 +108,7 @@ void call(int argc , char * argv[])
  
      //std::thread t3(sndfun, std::ref(s)); //引用  
      std::string strinfo; 
-     size_t datalen= collectdata(strinfo, 2000);
+     size_t datalen= collectdata(strinfo, 2000,filestr);
      sndfun(s, strinfo.data(),datalen);
      
      /*while(1) 

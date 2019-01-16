@@ -83,16 +83,16 @@ int main(int argc, char* argv[])
   try
   {
     uselog();
-    if (argc != 2)
+    if (argc != 3)
     {
-       std::cerr << "Usage: async_tcp_echo_server <port>\n";
+       std::cerr << "Usage: async_tcp_echo_server <port> <save_file>\n";
        return 1;
     }
 
     boost::asio::io_context io_context(1);
 
     int count = 0;
-    timeSave  tiSave(io_context);
+    timeSave  tiSave(io_context,std::string(argv[2]));
     g_uosSave = &tiSave;
     server s(io_context, std::atoi(argv[1]) );
 
