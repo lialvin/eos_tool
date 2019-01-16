@@ -58,13 +58,14 @@ private:
 	
 	    std::string strFile = save_file;
 	    std::ofstream outfile(strFile.c_str());   
-   
+        int count=0; 
 		for(auto iter = uosdata.begin(); iter != uosdata.end(); iter++)  			
 		{	
+            count++;
 			outfile<< iter->second << std::endl;
 			//cout<<iter->first<<' '<<iter->second<<endl;   
 		}	
-		
+        outfile<<"total    "<<count << endl; 		
 		outfile.close();
 		
 		uosdata.erase( uosdata.begin(), uosdata.end() );  
