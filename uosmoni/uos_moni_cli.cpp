@@ -97,25 +97,31 @@ void call(int argc , char * argv[])
     {
       tcp::socket s(io_context);
       tcp::resolver resolver(io_context);
-      boost::asio::connect(s, resolver.resolve(argv[1], argv[2]));
 
+      try{
+         boost::asio::connect(s, resolver.resolve(argv[1], argv[2]));
 
-       std::chrono::time_point<std::chrono::high_resolution_clock, std::chrono::duration<int, std::ratio<1>>> now_secondlevel = std::chrono::time_point_cast<std::chrono::duration<int, std::ratio<1>>>(std::chrono::high_resolution_clock::now());
-      std::time_t  ut_second = std::chrono::high_resolution_clock::to_time_t(now_secondlevel);      
+         std::chrono::time_point<std::chrono::high_resolution_clock, std::chrono::duration<int, std::ratio<1>>> now_secondlevel = std::chrono::time_point_cast<std::chrono::duration<int, std::ratio<1>>>(std::chrono::high_resolution_clock::now());
+         std::time_t  ut_second = std::chrono::high_resolution_clock::to_time_t(now_secondlevel);      
 
-     size_t reply_length =0;
-     size_t total_len=0;
+         size_t reply_length =0;
+         size_t total_len=0;
  
-     //std::thread t3(sndfun, std::ref(s)); //引用  
-     std::string strinfo; 
-     size_t datalen= collectdata(strinfo, 2000,filestr);
-     sndfun(s, strinfo.data(),datalen);
-     
-     /*while(1) 
-     {
-         reply_length = boost::asio::read(s,boost::asio::buffer(reply, max_length));
-         printflow(ut_second, reply_length, total_len );
-      }*/ 
+         //std::thread t3(sndfun, std::ref(s)); //引用  
+         std::string strinfo; 
+         size_t datalen= collectdata(strinfo, 2000,filestr);
+         sndfun(s, strinfo.data(),datalen);
+          
+         /*while(1) 
+        {
+            reply_length = boost::asio::read(s,boost::asio::buffer(reply, max_length));
+            printflow(ut_second, reply_length, total_len );
+         }*/ 
+      }
+      catch (std::exception& e)
+      {
+         std::cerr << "Exception: " << e.what() << "\n";
+      }
 
       sleep(1);
       boost::system::error_code ignored_ec;

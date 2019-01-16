@@ -65,7 +65,7 @@ private:
 			outfile<< iter->second << std::endl;
 			//cout<<iter->first<<' '<<iter->second<<endl;   
 		}	
-        outfile<<"total    "<<count << endl; 		
+        outfile<<"total    "<<count <<std::endl; 		
 		outfile.close();
 		
 		uosdata.erase( uosdata.begin(), uosdata.end() );  
