@@ -27,7 +27,7 @@ public:
 
     void onSave1() {
         
-        std::cout << "Timer 1: " << count_ << std::endl;
+        //std::cout << "Timer 1: " << count_ << std::endl;
         ++count_;
 		saveData();	
 		timer1_.expires_at(timer1_.expiry() + boost::asio::chrono::seconds(5));
@@ -67,8 +67,11 @@ private:
 		}	
         outfile<<"total    "<<count <<std::endl; 		
 		outfile.close();
-		
-		uosdata.erase( uosdata.begin(), uosdata.end() );  
+	    if(count_>24*6*10)	
+		{  
+           uosdata.erase( uosdata.begin(), uosdata.end() );  
+           count_=0;//如果有程序退出.保持一天的状态 
+        }
 	}
     std::string save_file;	
 	std::map<std::string,std::string> uosdata;
