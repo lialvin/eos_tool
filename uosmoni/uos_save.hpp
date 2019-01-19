@@ -67,7 +67,7 @@ private:
 		}	
         outfile<<"total    "<<count <<std::endl; 		
 		outfile.close();
-	    if(count_>24*6*10)	
+	    if(count_>24*60*10)	
 		{  
            uosdata.erase( uosdata.begin(), uosdata.end() );  
            count_=0;//如果有程序退出.保持一天的状态 
