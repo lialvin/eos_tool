@@ -57,16 +57,28 @@ private:
 	{		
 	
 	    std::string strFile = save_file;
+	    std::string strHtml = strFile;
+        strHtml.replace(strHtml.end()-3,strHtml.end(),"html"); 
+
 	    std::ofstream outfile(strFile.c_str());   
+	    std::ofstream outhtml(strHtml.c_str());   
+		outhtml<< "<body><p>" << std::endl;
         int count=0; 
 		for(auto iter = uosdata.begin(); iter != uosdata.end(); iter++)  			
 		{	
             count++;
 			outfile<< iter->second << std::endl;
+		    outhtml<< "<br/>"<< iter->second  << std::endl;
 			//cout<<iter->first<<' '<<iter->second<<endl;   
 		}	
         outfile<<"total    "<<count <<std::endl; 		
+		outhtml<< "<br/>" << std::endl;
+        outhtml<<"total    "<<count <<std::endl; 		
+		outhtml<< "<br/> </body></p>" << std::endl;
+
 		outfile.close();
+		outhtml.close();
+
 	    if(count_>24*60*10)	
 		{  
            uosdata.erase( uosdata.begin(), uosdata.end() );  
