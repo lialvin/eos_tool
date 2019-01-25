@@ -4,6 +4,7 @@
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <boost/algorithm/string.hpp> 
 #include <string>
  
 #include <iostream>
@@ -68,11 +69,12 @@ private:
 		{	
             count++;
 			outfile<< iter->second << std::endl;
-		    outhtml<< "<br/>"<< iter->second  << std::endl;
+            std::string outputstr = iter->second;
+            boost::algorithm::replace_all(outputstr,"\n","<br/>" );
+		    outhtml<< "<br/>"<< outputstr  << std::endl;
 			//cout<<iter->first<<' '<<iter->second<<endl;   
 		}	
         outfile<<"total    "<<count <<std::endl; 		
-		outhtml<< "<br/>" << std::endl;
         outhtml<<"total    "<<count <<std::endl; 		
 		outhtml<< "<br/> </body></p>" << std::endl;
 
