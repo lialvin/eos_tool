@@ -29,7 +29,7 @@ private:
         {
           if (!ec)
           {
-            BOOST_LOG_TRIVIAL(info) << "receive "<< socket_.remote_endpoint().address()<< " length "<< length;  
+            //BOOST_LOG_TRIVIAL(info) << "receive "<< socket_.remote_endpoint().address()<< " length "<< length;  
             //BOOST_LOG_TRIVIAL(info) << "receive "<< data_ << " length "<< length;  
             do_deal(length);
           }

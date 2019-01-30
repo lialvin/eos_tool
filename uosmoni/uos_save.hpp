@@ -37,7 +37,7 @@ public:
 
     void onSave2() {
         if (count_ < 10) {
-            std::cout << "Timer 2: " << count_ << std::endl;
+            //std::cout << "Timer 2: " << count_ << std::endl;
             ++count_;
             timer2_.expires_at(timer2_.expiry() + boost::asio::chrono::seconds(6));
             timer2_.async_wait(boost::asio::bind_executor(strand_,boost::bind(&timeSave::onSave2,this)));

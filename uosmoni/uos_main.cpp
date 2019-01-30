@@ -60,8 +60,8 @@ void initlog()
 
 void uselog()
 {
-    initlog();
-    testlog();
+//    initlog();
+//    testlog();
 }
 
 int testlog( )
@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
   }
   catch (std::exception& e)
   {
-    std::cerr << "Exception: " << e.what() << "\n";
+    std::cerr << "Exception: exit " << e.what() << "\n";
   }
 
   return 0;
