@@ -25,7 +25,12 @@ void server(boost::asio::io_context& io_context, unsigned short port)
     udp::endpoint sender_endpoint;
     size_t length = sock.receive_from(
         boost::asio::buffer(data, max_length), sender_endpoint);
-    sock.send_to(boost::asio::buffer(data, length), sender_endpoint);
+
+    std::cout << "server recv is: ";
+    std::cout.write(data, length);
+    std::cout << "\n";
+
+    //sock.send_to(boost::asio::buffer(data, length), sender_endpoint);
   }
 }
 

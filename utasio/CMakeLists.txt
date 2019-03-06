@@ -28,3 +28,6 @@ target_link_libraries(async_server ${IMPORTLIB})
 add_executable(tcp_client  blocking_tcp_echo_client.cpp)
 target_link_libraries(tcp_client  ${IMPORTLIB})
 
+add_executable(udp_server  blocking_udp_echo_server.cpp)
+target_link_libraries(udp_server  ${IMPORTLIB})
+
