@@ -18,6 +18,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include "reply.hpp"
 #include "TcpSplitPkt.h"
+#include "BizDeal.h"
 
 namespace dapp {
 namespace server2 {
@@ -50,7 +51,8 @@ private:
   boost::asio::ip::tcp::socket socket_;
 
   CTcpSplitPkt  splitPkt_;
-  
+  CBizDeal      bizDeal_;
+    
   /// The handler used to process the incoming request.
   ///request_handler& request_handler_;
 

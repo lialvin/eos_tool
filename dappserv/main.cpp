@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
     // Check command line arguments.
     if (argc != 5)
     {
-      std::cerr << "Usage: http_server <address> <port> <threads> <doc_root>\n";
+      std::cerr << "Usage: http_server <address> <port> <threads> <log_dir>\n";
       std::cerr << "  For IPv4, try:\n";
       std::cerr << "    receiver 0.0.0.0 80 1 .\n";
       std::cerr << "  For IPv6, try:\n";

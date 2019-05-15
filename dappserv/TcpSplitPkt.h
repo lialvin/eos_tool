@@ -32,6 +32,8 @@ public:
 	int    DealConnectData( BYTE * pData, int nDataSize  );
 		
 	int                 m_iIdx;
+    std::queue<std::string>    bufqueue;
+
 protected:
  
 	unsigned char   * m_pTcpBuf;

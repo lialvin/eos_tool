@@ -12,7 +12,7 @@
 namespace dapp {
 namespace server {
 
-class tcpClient {
+class cliTimer {
 public:
     tcpClient(boost::asio::io_context& io) :strand_(io),
     timer1_(io,boost::asio::chrono::seconds(1)),timer2_(io,boost::asio::chrono::seconds(1)),count_(0){

@@ -19,6 +19,7 @@ namespace server2 {
 connection::connection(boost::asio::io_context& io_context)
   : socket_(io_context)
 {
+  bizDeal.init();
 }
 
 boost::asio::ip::tcp::socket& connection::socket()
@@ -87,7 +88,7 @@ void connection::handle_read(const boost::system::error_code& e,std::size_t byte
 	int  ret = splitPkt_.DealConnectData((BYTE*) buffer_.data(),   bytes_transferred);
 	
 	
-	if (ret==2 ) //success 
+	if (ret==3 ) //success 
 	{
 
 	  boost::asio::async_write(socket_, reply_.to_buffers(),
@@ -101,14 +102,9 @@ void connection::handle_read(const boost::system::error_code& e,std::size_t byte
 		  boost::bind(&connection::handle_write, shared_from_this(),
 			boost::asio::placeholders::error));
 	}
-	
-	else if(ret==1) // continue read 
+	else if(ret==1|| ret==2) // continue read 
 	{
-	  socket_.async_read_some(boost::asio::buffer(buffer_),
-		  boost::bind(&connection::handle_read, shared_from_this(),
-			boost::asio::placeholders::error,
-			boost::asio::placeholders::bytes_transferred));
-	  
+         write();
 	}
   }
 
@@ -120,9 +116,24 @@ void connection::handle_read(const boost::system::error_code& e,std::size_t byte
 
 void connection::write( )
 {
-	boost::asio::async_write(socket_, reply_.to_buffers(),
-			boost::bind(&connection::handle_write, shared_from_this(),
+    std::string buf;
+    if( splitPkt_.bufqueue.size()>0)
+    {
+       std::string retbuf= splitPkt_.bufqueue.pop();
+       bizDeal.Run(retbuf.data,retbuf.length());       
+	      boost::asio::async_write(socket_, reply_.to_buffers(),
+			boost::bind(&connection::write, shared_from_this(),
 			  boost::asio::placeholders::error));
+
+    }
+    else 
+    {
+         socket_.async_read_some(boost::asio::buffer(buffer_),
+           boost::bind(&connection::handle_read, shared_from_this(),
+            boost::asio::placeholders::error,
+            boost::asio::placeholders::bytes_transferred));
+
+    }
 
 }
 

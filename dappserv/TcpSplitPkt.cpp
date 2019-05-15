@@ -33,7 +33,7 @@ void    CTcpSplitPkt::Decode(BYTE * pBuf ,int nPktLen )
 {
     //m_pSplitObj->DealCliPkt(pBuf,nPktLen); 
     //request_handler_.handle_request(request_, reply_);
-	
+    bufqueue.push(std::string(pBuf,nPktLen);	
 }
 
 bool  CTcpSplitPkt::IsFullPkg(BYTE *& pReadPos,int & nReadLen)
@@ -95,12 +95,6 @@ int  CTcpSplitPkt::DealConnectData(  BYTE * pData, int nDataSize  )
 	m_nLeftLen = m_nLeftLen + nRetLen;
 	
 	
-	if(m_nLeftLen > RECV_HALF_SIZE  + nRetLen  )
-	{
-		return 0; 	
-	}
-
-	
 	pReadPos = pTcpBuf;
 	int nReadLen = m_nLeftLen;
 
@@ -121,8 +115,13 @@ int  CTcpSplitPkt::DealConnectData(  BYTE * pData, int nDataSize  )
 		{
             ret= 2;
 		}	
+        else 
+        {
+            ret = 1;
+        }
 	}
 	return ret;
 }
+
 
 
