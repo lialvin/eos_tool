@@ -36,6 +36,8 @@ public:
 
   /// Stop all connections.
   void stop_all();
+  
+  std::map<std::string ,int > infotable;
 
 private:
   /// The managed connections.
