@@ -16,10 +16,19 @@
 namespace dapp {
 namespace server2 {
 
-connection::connection(boost::asio::io_context& io_context)
-  : socket_(io_context)
+connection::connection(boost::asio::io_context& io_context, connection_manager& manager)
+  : socket_(io_context),   connection_manager_(manager)
 {
   bizDeal_.Init();
+}
+
+connection::connection(boost::asio::ip::tcp::socket socket,connection_manager& manager)
+  : socket_(std::move(socket)),   connection_manager_(manager)
+
+{
+   bizDeal_.Init();
+   //splitPkt_.datahandlefun_= std::bind(&connection::request_handle, this, std::placeholders::_1, std::placeholders::_2); 
+   //FuncIntInt = std::bind(&Functor::set_intint, test, std::placeholders::_1, std::placeholders::_2);
 }
 
 boost::asio::ip::tcp::socket& connection::socket()
@@ -156,8 +165,11 @@ void connection::handle_write(const boost::system::error_code& e)
     // Initiate graceful connection closure.
     boost::system::error_code ignored_ec;
     socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
-  }
 
+     boost::shared_ptr<connection>  p = shared_from_this(); 
+     //connection_manager_->stop( p ); 
+  }
+  
   // No new asynchronous operations are started. This means that all shared_ptr
   // references to the connection object will disappear and the object will be
   // destroyed automatically after this handler returns. The connection class's

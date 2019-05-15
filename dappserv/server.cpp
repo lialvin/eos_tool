@@ -43,6 +43,8 @@ server::server(const std::string& address, const std::string& port,
   acceptor_.listen();
 
   start_accept();
+//  do_accept();
+  
 }
 
 void server::run()
@@ -50,18 +52,18 @@ void server::run()
   io_context_pool_.run();
 }
 // new_connection_ is can support two connect ?
+
 void server::start_accept()
 {
 
   new_connection_.reset(new connection(
-        io_context_pool_.get_io_context()));
+        io_context_pool_.get_io_context(), connection_manager_));
   //      io_context_pool_.get_io_context(), request_handler_));
   
   acceptor_.async_accept(new_connection_->socket(),
       boost::bind(&server::handle_accept, this,
         boost::asio::placeholders::error));
 
-  connection_manager_.start(new_connection_ );
 }
 
 void server::handle_accept(const boost::system::error_code& e)
@@ -69,11 +71,49 @@ void server::handle_accept(const boost::system::error_code& e)
   if (!e)
   {
     new_connection_->start();
-//    connection_manager_.start(new_connection_);
+    //  connection_manager_.start(new_connection_);
   }
 
   start_accept();
 }
+
+
+void server::do_accept() 
+{
+  acceptor_.async_accept(
+      [this](boost::system::error_code ec, boost::asio::ip::tcp::socket socket)
+      {
+        // Check whether the server was stopped by a signal before this
+        // completion handler had a chance to run.
+        if (!acceptor_.is_open())
+        {
+          return;
+        } 
+        
+        if (!ec)
+        {
+            boost::shared_ptr<connection> conn(new connection(std::move(socket), connection_manager_));
+            connection_manager_.start(conn);  
+        }     
+        
+        do_accept();
+      });
+}     
+
+void server::do_await_stop()
+{
+  signals_.async_wait(
+      [this](boost::system::error_code , int )
+      {
+        // The server is stopped by cancelling all outstanding asynchronous
+        // operations. Once all operations have finished the io_context::run()
+        // call will exit.
+        acceptor_.close();
+        connection_manager_.stop_all();
+      });
+}  
+
+
 
 void server::handle_stop()
 {

@@ -20,9 +20,12 @@
 #include "TcpSplitPkt.h"
 #include "BizDeal.h"
 
+//#include "connection_manager.hpp"
+
 namespace dapp {
 namespace server2 {
 
+class connection_manager;
 /// Represents a single connection from a client.
 class connection
   : public boost::enable_shared_from_this<connection>,
@@ -30,15 +33,15 @@ class connection
 {
 public:
   /// Construct a connection with the given io_context.
-  explicit connection(boost::asio::io_context& io_context );
-
+  explicit connection(boost::asio::io_context& io_context, connection_manager& manager );
+  explicit connection(boost::asio::ip::tcp::socket socket, connection_manager& manager);
   /// Get the socket associated with the connection.
   boost::asio::ip::tcp::socket& socket();
 
   /// Start the first asynchronous operation for the connection.
   void start();
   void write( const boost::system::error_code& e);
-  void stop();
+  void stop( );
 private:
   /// Handle completion of a read operation.
   void handle_read(const boost::system::error_code& e,
@@ -67,6 +70,8 @@ private:
 
   ///if error, The reply to be sent back to the client.
   reply reply_;
+  connection_manager& connection_manager_;
+
 };
 
 typedef boost::shared_ptr<connection> connection_ptr;

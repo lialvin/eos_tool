@@ -43,6 +43,8 @@ private:
   /// Handle completion of an asynchronous accept operation.
   void handle_accept(const boost::system::error_code& e);
 
+  void  do_accept();
+  void  do_await_stop();
   /// Handle a request to stop the server.
   void handle_stop();
 

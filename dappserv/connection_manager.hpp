@@ -29,10 +29,10 @@ public:
   connection_manager();
 
   /// Add the specified connection to the manager and start it.
-  void start(connection_ptr c);
+  void start(boost::shared_ptr<connection>  c);
 
   /// Stop the specified connection.
-  void stop(connection_ptr c);
+  void stop(boost::shared_ptr<connection> c);
 
   /// Stop all connections.
   void stop_all();
