@@ -13,6 +13,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
+#include "cliTimer.hpp"
 
 namespace dapp {
 namespace server2 {
@@ -37,11 +38,16 @@ void io_context_pool::run()
 {
   // Create a pool of threads to run all of the io_contexts.
   std::vector<boost::shared_ptr<boost::thread> > threads;
+  std::vector<boost::shared_ptr<cliTimer> > cliTimers;
   for (std::size_t i = 0; i < io_contexts_.size(); ++i)
   {
+    boost::shared_ptr<cliTimer> clitimer(new cliTimer(io_contexts_[i]));
+    cliTimers.push_back(clitimer);
+
     boost::shared_ptr<boost::thread> thread(new boost::thread(
           boost::bind(&boost::asio::io_context::run, io_contexts_[i])));
     threads.push_back(thread);
+     
   }
 
   // Wait for all threads in the pool to exit.
