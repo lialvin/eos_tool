@@ -3,6 +3,7 @@
 
 #include "ostypedef.h"
 #include <string>
+#include <queue>
 
 #define   RECV_SPLI_BUF_SIZE    64*1024
 #define   RECV_HALF_SIZE    32*1024   //RECV_BUF_SIZE   half length

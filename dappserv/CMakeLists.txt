@@ -11,14 +11,16 @@ set(MAIN_SRC_LIST
     server.cpp  
     TcpSplitPkt.cpp
     io_context_pool.cpp  
+    connection_manager.cpp
   )
 
 set(MAIN_HEADERS
    BizDeal.h  netpdu.h  TcpSplitPkt.h
    ostypedef.h
    connection.hpp   
-   reply.hpp  server.hpp  tcpclient.hpp
-   io_context_pool.hpp
+   reply.hpp  server.hpp  cliTimer.hpp
+   io_context_pool.hpp 
+   connection_manager.hpp
 
 )
 

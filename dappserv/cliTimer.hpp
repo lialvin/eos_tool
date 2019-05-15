@@ -6,21 +6,21 @@
 #include <boost/bind.hpp>
 #include <string>
 #include "connection.hpp"
-#include "connection_manager.hpp"
+#include <iostream>
 
 
 namespace dapp {
-namespace server {
+namespace server2 {
 
 class cliTimer {
 public:
-    tcpClient(boost::asio::io_context& io) :strand_(io),
-    timer1_(io,boost::asio::chrono::seconds(1)),timer2_(io,boost::asio::chrono::seconds(1)),count_(0){
-        timer1_.async_wait(boost::asio::bind_executor(strand_,boost::bind(&tcpClient::print1,this)));
-        timer2_.async_wait(boost::asio::bind_executor(strand_,boost::bind(&tcpClient::print2,this)));
+    cliTimer(boost::shared_ptr<boost::asio::io_context>  io) :strand_(*io),
+    timer1_(*io,boost::asio::chrono::seconds(1)),timer2_(*io,boost::asio::chrono::seconds(1)),count_(0){
+        timer1_.async_wait(boost::asio::bind_executor(strand_,boost::bind(&cliTimer::print1,this)));
+        timer2_.async_wait(boost::asio::bind_executor(strand_,boost::bind(&cliTimer::print2,this)));
     }
 
-    ~tcpClient() {
+    ~cliTimer() {
         std::cout << "Final count is " << count_ << std::endl;
     }
 
@@ -29,7 +29,7 @@ public:
             std::cout << "Timer 1: " << count_ << std::endl;
             ++count_;
         timer1_.expires_at(timer1_.expiry() + boost::asio::chrono::seconds(5));
-        timer1_.async_wait(boost::asio::bind_executor(strand_,boost::bind(&tcpClient::print1,this)));
+        timer1_.async_wait(boost::asio::bind_executor(strand_,boost::bind(&cliTimer::print1,this)));
         }
     }
 
@@ -38,7 +38,7 @@ public:
             std::cout << "Timer 2: " << count_ << std::endl;
             ++count_;
             timer2_.expires_at(timer2_.expiry() + boost::asio::chrono::seconds(1));
-            timer2_.async_wait(boost::asio::bind_executor(strand_,boost::bind(&tcpClient::print2,this)));
+            timer2_.async_wait(boost::asio::bind_executor(strand_,boost::bind(&cliTimer::print2,this)));
         }
     }
 

@@ -33,7 +33,7 @@ void    CTcpSplitPkt::Decode(BYTE * pBuf ,int nPktLen )
 {
     //m_pSplitObj->DealCliPkt(pBuf,nPktLen); 
     //request_handler_.handle_request(request_, reply_);
-    bufqueue.push(std::string(pBuf,nPktLen);	
+    bufqueue.push(std::string((char*)pBuf,nPktLen));	
 }
 
 bool  CTcpSplitPkt::IsFullPkg(BYTE *& pReadPos,int & nReadLen)

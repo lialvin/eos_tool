@@ -9,6 +9,7 @@
 //
 
 #include "server.hpp"
+#include "connection_manager.hpp"
 #include <boost/bind.hpp>
 
 namespace dapp {
@@ -19,6 +20,7 @@ server::server(const std::string& address, const std::string& port,
   : io_context_pool_(io_context_pool_size),
     signals_(io_context_pool_.get_io_context()),
     acceptor_(io_context_pool_.get_io_context()),
+    connection_manager_(),
     new_connection_()
 {
   // Register to handle the signals that indicate when the server should exit.
@@ -47,9 +49,10 @@ void server::run()
 {
   io_context_pool_.run();
 }
-
+// new_connection_ is can support two connect ?
 void server::start_accept()
 {
+
   new_connection_.reset(new connection(
         io_context_pool_.get_io_context()));
   //      io_context_pool_.get_io_context(), request_handler_));
@@ -57,6 +60,8 @@ void server::start_accept()
   acceptor_.async_accept(new_connection_->socket(),
       boost::bind(&server::handle_accept, this,
         boost::asio::placeholders::error));
+
+  connection_manager_.start(new_connection_ );
 }
 
 void server::handle_accept(const boost::system::error_code& e)
@@ -64,6 +69,7 @@ void server::handle_accept(const boost::system::error_code& e)
   if (!e)
   {
     new_connection_->start();
+//    connection_manager_.start(new_connection_);
   }
 
   start_accept();

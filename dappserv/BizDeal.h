@@ -13,6 +13,8 @@ public:
 	void         Init(/*CCliTask   * pTaskScan*/);
 	void         Run(BYTE*,int);
 
+    int          getSendDataLength();
+    BYTE*        getSendData();
 	// 
 	int          BeginReqFile(char * szFile);
 	// 
@@ -41,6 +43,7 @@ private:
 	bool         m_bRequestThreadRunFlag;
 	char       * m_pFileName;
 	char         m_szTranFile[256];//放置临时文件。
+    int          m_nSendLen;
 };
 
 #endif

@@ -37,8 +37,8 @@ public:
 
   /// Start the first asynchronous operation for the connection.
   void start();
-  void write( );
-
+  void write( const boost::system::error_code& e);
+  void stop();
 private:
   /// Handle completion of a read operation.
   void handle_read(const boost::system::error_code& e,
@@ -65,7 +65,7 @@ private:
   /// The parser for the incoming request.
   ///request_parser request_parser_;
 
-  /// The reply to be sent back to the client.
+  ///if error, The reply to be sent back to the client.
   reply reply_;
 };
 

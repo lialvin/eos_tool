@@ -19,7 +19,7 @@ namespace server2 {
 connection::connection(boost::asio::io_context& io_context)
   : socket_(io_context)
 {
-  bizDeal.init();
+  bizDeal_.Init();
 }
 
 boost::asio::ip::tcp::socket& connection::socket()
@@ -72,10 +72,6 @@ void connection::handle_read(const boost::system::error_code& e,
     }
   }
 
-  // If an error occurs then no new asynchronous operations are started. This
-  // means that all shared_ptr references to the connection object will
-  // disappear and the object will be destroyed automatically after this
-  // handler returns. The connection class's destructor closes the socket.
 }
 */
 
@@ -104,7 +100,7 @@ void connection::handle_read(const boost::system::error_code& e,std::size_t byte
 	}
 	else if(ret==1|| ret==2) // continue read 
 	{
-         write();
+         write(e);
 	}
   }
 
@@ -114,26 +110,42 @@ void connection::handle_read(const boost::system::error_code& e,std::size_t byte
   // handler returns. The connection class's destructor closes the socket.
 }
 
-void connection::write( )
+void connection::write(const boost::system::error_code& e )
 {
     std::string buf;
     if( splitPkt_.bufqueue.size()>0)
     {
-       std::string retbuf= splitPkt_.bufqueue.pop();
-       bizDeal.Run(retbuf.data,retbuf.length());       
-	      boost::asio::async_write(socket_, reply_.to_buffers(),
-			boost::bind(&connection::write, shared_from_this(),
-			  boost::asio::placeholders::error));
-
+       std::string retbuf = splitPkt_.bufqueue.front();
+       splitPkt_.bufqueue.pop();
+       bizDeal_.Run((BYTE*) retbuf.data(),retbuf.length());       
+       if(bizDeal_.getSendDataLength()>0)
+       {
+           boost::asio::const_buffer buffer(bizDeal_.getSendData(),bizDeal_.getSendDataLength());
+           boost::asio::async_write(socket_, buffer,
+			    boost::bind(&connection::write, shared_from_this(),
+			    boost::asio::placeholders::error));
+       }
+       else 
+       {
+          write(e);  
+       }
     }
     else 
     {
-         socket_.async_read_some(boost::asio::buffer(buffer_),
-           boost::bind(&connection::handle_read, shared_from_this(),
+       socket_.async_read_some(boost::asio::buffer(buffer_),
+            boost::bind(&connection::handle_read, shared_from_this(),
             boost::asio::placeholders::error,
             boost::asio::placeholders::bytes_transferred));
 
     }
+
+}
+
+void connection::stop()
+{
+
+   boost::system::error_code ignored_ec;
+   socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
 
 }
 

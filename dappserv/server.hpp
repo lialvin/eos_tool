@@ -18,7 +18,7 @@
 #include <boost/shared_ptr.hpp>
 #include "connection.hpp"
 #include "io_context_pool.hpp"
-#include "request_handler.hpp"
+#include "connection_manager.hpp"
 
 namespace dapp {
 namespace server2 {
@@ -57,7 +57,7 @@ private:
 
   /// The next connection to be accepted.
   connection_ptr new_connection_;
-
+  connection_manager  connection_manager_;
 
 };
 

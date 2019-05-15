@@ -26,12 +26,12 @@ const char crlf[] = { '\r', '\n' };
 std::vector<boost::asio::const_buffer> reply::to_buffers()
 {
   std::vector<boost::asio::const_buffer> buffers;
-  buffers.push_back(boost::asio::buffer("asdfstest"));
+  buffers.push_back(boost::asio::buffer("error occur; close connect"));
   
-  buffers.push_back(boost::asio::buffer(content));
+  buffers.push_back(boost::asio::buffer("this is a server error  reply"));
   return buffers;
 }
 
-} // namespace server
+} // namespace server2
 } // namespace dapp
 

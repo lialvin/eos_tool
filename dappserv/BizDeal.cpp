@@ -21,6 +21,7 @@ void  CBizDeal::Init()
 	SET_HEAD_FLAG(m_pSendBuf);
 	m_pFileName = new char[1024];
 	memset(m_pFileName, 0, 1024);
+    m_nSendLen=0;
 	//g_pTcpServer->ReadCfg();	
 }
 
@@ -37,9 +38,22 @@ CBizDeal::~CBizDeal()
 	
 */
 
-void CBizDeal::Run(BYTE* pBuf,int nLen)
+
+int     CBizDeal::getSendDataLength()
 {
-		
+   return m_nSendLen;
+}
+
+BYTE*   CBizDeal::getSendData()
+{
+
+  return  m_pSendBuf;
+}
+
+void  CBizDeal::Run(BYTE* pBuf,int nLen)
+{
+   
+    m_nSendLen=0;		
 	NET_PKG_HEAD * p = (NET_PKG_HEAD*)pBuf;
 	if( !(CHECK_HEAD_FLAG(pBuf)))
 	{
