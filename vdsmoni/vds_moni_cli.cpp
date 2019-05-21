@@ -11,7 +11,6 @@
 #include <chrono>  
 #include <boost/filesystem.hpp>
 #include <boost/process.hpp>
-
 #include <boost/tokenizer.hpp>
 #include <boost/lexical_cast.hpp>
 #include <regex>
@@ -33,13 +32,13 @@ using boost::asio::ip::tcp;
 
 enum { max_length = 10240 };
 
-
+namespace bp = boost::process;
 
 void call();
 void  printflow( std::time_t &  old_value, size_t reply_length, size_t & total_len );
 std::vector<std::string> read_vds(std::string filestr);
 size_t   collectdata( std::string & nodeinfo, size_t  buflen,std::string filestr);
-
+std::string do_exec(std::string filestr );
 
 
 using namespace std;
@@ -134,7 +133,8 @@ void call()
     int  nMasternodestatus; 
     int  nNodeState =3;  // default 3 ,  0: no start , 1: start no sync , 2 sync finish ,can getinfo . no master , 3: master status recovery
     std::time_t  node_start_time=0;
-
+    int  nGetInfoCount=0;
+    int  nMasterStatusCount=6;
     int  waitTime1 = 10*60 , waitTime2= 5*60 , waitTime3= 60; 
 
     // do every step , stop 3 minute;  
@@ -168,10 +168,12 @@ void call()
 
              BOOST_LOG_TRIVIAL(info) << "vdsnode no  start, now is  "<<  ctime(&ut_second) << "  ";
 
-             datalen= collectdata(vdsdisstart , 2000,"/home/vds/vdsmoni/vdsstart.sh");
-             sleep(10);
+             //  datalen= collectdata(vdsdisstart , 2000,"/home/vds/vdsmoni/vdsstart.sh");
+             std::string resstr = do_exec( "/home/vds/vdsmoni/vdsstart.sh"  );
 
-             BOOST_LOG_TRIVIAL(info) << "vdsnode  start, after 10 second  " << "  ";
+             sleep(2);
+
+             BOOST_LOG_TRIVIAL(info) << "vdsnode  start, after 10 second  " << resstr<<  "  ";
              
              datalen= collectdata(vdsdisstart , 2000,"/home/vds/vdsmoni/vdsisstart.sh");
 
@@ -189,12 +191,13 @@ void call()
              }
          }
 
-
+         
+         //BOOST_LOG_TRIVIAL(info) << "vdsnode  starting time  "<<  ut_second << "  "<< node_start_time <<"";
          if(ut_second - node_start_time < 60*10)   
          {
              BOOST_LOG_TRIVIAL(info) << "vdsnode  starting , now is  "<<  ctime(&ut_second) << "  ";
 
-             sleep(10);
+             sleep(60);
              continue; 
          }
 
@@ -214,10 +217,17 @@ void call()
          catch(boost::bad_lexical_cast & e)  
          {
              BOOST_LOG_TRIVIAL(info) << "vdsnode getinfo failed , now is  "<<  ctime(&ut_second) << "  ";
-             sleep(20);
+             nGetInfoCount++;
+             if(nGetInfoCount > 5)
+             { 
+                  BOOST_LOG_TRIVIAL(info) << "vdsnode getinfo failed , stop node  now is  "<<  ctime(&ut_second) << "  ";
+                  int len= collectdata(strinfo, 2000,"/home/vds/vdsmoni/vdsstop.sh");
+             }
+             sleep(60);
              continue; 
          }
 
+         nGetInfoCount = 0 ;
          datalen= collectdata(remoteinfo, 2000,getremoteinfo);
 
          found = remoteinfo.find("height");
@@ -242,10 +252,11 @@ void call()
              if(block > oldblockno ) 
              {   
                  oldblockno= block; 
+                 sleep(120);
              }
              else  // no sync need stop vds
              {
-                 BOOST_LOG_TRIVIAL(info) << "vdsnode stop  now is  "<<  ctime(&ut_second) << "  ";
+                 BOOST_LOG_TRIVIAL(info) << "vdsnode stop "<<block<<"  "<<oldblockno<<" now is  "<<  ctime(&ut_second) << "  ";
                  int len= collectdata(strinfo, 2000,"/home/vds/vdsmoni/vdsstop.sh");
                  sleep(120);
              }
@@ -264,12 +275,18 @@ void call()
              {
                  BOOST_LOG_TRIVIAL(info) << "vdsnode masternode success,   now is  "<<  ctime(&ut_second) << "  ";
                  nMasternodestatus = 1;
+                 nMasterStatusCount=0;
              }
              else
              {
-                 BOOST_LOG_TRIVIAL(info) << "vdsnode masternode  failed ,send masternode   now is  "<<  ctime(&ut_second) << "  ";
-                 nMasternodestatus = 0;
-                 int len= collectdata(masterstatus, 2000,"/home/vds/vdsmoni/startmaster.sh");
+                 nMasterStatusCount++;
+                 BOOST_LOG_TRIVIAL(info) << "vdsnode masternode  failed.info=  "<<masterinfo<< "   now is  "<<  ctime(&ut_second) << "  ";
+                 if(nMasterStatusCount>5)
+                 {
+                    BOOST_LOG_TRIVIAL(info) << "vdsnode masternode  failed ,send masternode   now is  "<<  ctime(&ut_second) << "  ";
+                    nMasternodestatus = 0;
+                    int len= collectdata(masterinfo, 2000,"/home/vds/vdsmoni/startmaster.sh");
+                 }
              } 
 
          } 
@@ -322,6 +339,16 @@ void  printflow( std::time_t &  old_value, size_t reply_length, size_t & total_l
          old_value= ut_second;  
          total_len=0;
      }
+}
+
+
+std::string   do_exec(std::string filestr )
+{
+    std::string res;
+    res = system((char*)filestr.data());
+
+     return res ; 
+       //std::cout<<"std::cout read uos  "<< std::endl; 
 }
 
 std::vector<std::string> read_vds(std::string filestr)
