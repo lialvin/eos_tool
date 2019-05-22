@@ -133,7 +133,6 @@ void call()
     int  nMasternodestatus; 
     int  nNodeState =3;  // default 3 ,  0: no start , 1: start no sync , 2 sync finish ,can getinfo . no master , 3: master status recovery
     std::time_t  node_start_time=0;
-    int  nGetInfoCount=0;
     int  nMasterStatusCount=6;
     int  waitTime1 = 10*60 , waitTime2= 5*60 , waitTime3= 60; 
 
@@ -155,6 +154,7 @@ void call()
 
 
          std::string vdsdisstart ;
+         int  nGetInfoCount=0;
          
          int datalen= collectdata(vdsdisstart , 2000,"/home/vds/vdsmoni/vdsisstart.sh");
          std::size_t found = vdsdisstart.find("vdsd");
@@ -205,9 +205,25 @@ void call()
  
          std::string strinfo,remoteinfo,masterinfo; 
          datalen= collectdata(strinfo, 2000,getinfo);
+         
+         found= strinfo.find("Verifying Blocks");
+         if (found!=std::string::npos)
+         {
+             BOOST_LOG_TRIVIAL(info) << "vdsnode getinfo failed , now is  "<<strinfo<<"  "<<  ctime(&ut_second) << "  "; 
+             sleep(60);
+             continue; 
+         } 
+
+         found= strinfo.find("Loading block");
+         if (found!=std::string::npos)
+         {
+             BOOST_LOG_TRIVIAL(info) << "vdsnode getinfo failed , now is  "<<strinfo<<"  "<<  ctime(&ut_second) << "  ";
+             sleep(60);
+             continue;
+         }
+
          std::string result = getnumber(strinfo);
-   
-        
+         
          int block = 0 ;
          int remoteblock = 0 ;
 
@@ -216,11 +232,13 @@ void call()
          }
          catch(boost::bad_lexical_cast & e)  
          {
-             BOOST_LOG_TRIVIAL(info) << "vdsnode getinfo failed , now is  "<<  ctime(&ut_second) << "  ";
+             BOOST_LOG_TRIVIAL(info) << "vdsnode getinfo failed , now is  "<<nGetInfoCount<<"  "<<  ctime(&ut_second) << "  ";
              nGetInfoCount++;
-             if(nGetInfoCount > 5)
+             if(nGetInfoCount > 10)
              { 
                   BOOST_LOG_TRIVIAL(info) << "vdsnode getinfo failed , stop node  now is  "<<  ctime(&ut_second) << "  ";
+                  oldblockno=0;
+                  nGetInfoCount = 0 ;
                   int len= collectdata(strinfo, 2000,"/home/vds/vdsmoni/vdsstop.sh");
              }
              sleep(60);
@@ -258,6 +276,7 @@ void call()
              {
                  BOOST_LOG_TRIVIAL(info) << "vdsnode stop "<<block<<"  "<<oldblockno<<" now is  "<<  ctime(&ut_second) << "  ";
                  int len= collectdata(strinfo, 2000,"/home/vds/vdsmoni/vdsstop.sh");
+                 oldblockno=0;
                  sleep(120);
              }
             
