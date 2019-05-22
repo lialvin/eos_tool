@@ -135,6 +135,7 @@ void call()
     std::time_t  node_start_time=0;
     int  nMasterStatusCount=6;
     int  waitTime1 = 10*60 , waitTime2= 5*60 , waitTime3= 60; 
+     int  nGetInfoCount=0;
 
     // do every step , stop 3 minute;  
        
@@ -154,7 +155,6 @@ void call()
 
 
          std::string vdsdisstart ;
-         int  nGetInfoCount=0;
          
          int datalen= collectdata(vdsdisstart , 2000,"/home/vds/vdsmoni/vdsisstart.sh");
          std::size_t found = vdsdisstart.find("vdsd");
@@ -170,7 +170,9 @@ void call()
 
              //  datalen= collectdata(vdsdisstart , 2000,"/home/vds/vdsmoni/vdsstart.sh");
              std::string resstr = do_exec( "/home/vds/vdsmoni/vdsstart.sh"  );
+             nGetInfoCount=0;
 
+             oldblockno=0;
              sleep(2);
 
              BOOST_LOG_TRIVIAL(info) << "vdsnode  start, after 10 second  " << resstr<<  "  ";
@@ -209,7 +211,7 @@ void call()
          found= strinfo.find("Verifying Blocks");
          if (found!=std::string::npos)
          {
-             BOOST_LOG_TRIVIAL(info) << "vdsnode getinfo failed , now is  "<<strinfo<<"  "<<  ctime(&ut_second) << "  "; 
+             BOOST_LOG_TRIVIAL(info) << "vdsnode getinfo failed, verify block   "<<strinfo<<"  "<<  ctime(&ut_second) << "  "; 
              sleep(60);
              continue; 
          } 
@@ -217,7 +219,7 @@ void call()
          found= strinfo.find("Loading block");
          if (found!=std::string::npos)
          {
-             BOOST_LOG_TRIVIAL(info) << "vdsnode getinfo failed , now is  "<<strinfo<<"  "<<  ctime(&ut_second) << "  ";
+             BOOST_LOG_TRIVIAL(info) << "vdsnode getinfo failed ,load block   "<<strinfo<<"  "<<  ctime(&ut_second) << "  ";
              sleep(60);
              continue;
          }
@@ -232,9 +234,9 @@ void call()
          }
          catch(boost::bad_lexical_cast & e)  
          {
-             BOOST_LOG_TRIVIAL(info) << "vdsnode getinfo failed , now is  "<<nGetInfoCount<<"  "<<  ctime(&ut_second) << "  ";
+             BOOST_LOG_TRIVIAL(info) << "vdsnode getinfo failed,lexical  , now is  "<<nGetInfoCount<<"  "<<  ctime(&ut_second) << "  ";
              nGetInfoCount++;
-             if(nGetInfoCount > 10)
+             if(nGetInfoCount > 20)
              { 
                   BOOST_LOG_TRIVIAL(info) << "vdsnode getinfo failed , stop node  now is  "<<  ctime(&ut_second) << "  ";
                   oldblockno=0;
