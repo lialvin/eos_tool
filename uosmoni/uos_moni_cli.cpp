@@ -11,18 +11,35 @@
 #include<chrono>  
 #include <boost/filesystem.hpp>
 #include <boost/process.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/lexical_cast.hpp>
+#include <regex>
 
 using boost::asio::ip::tcp;
 
 enum { max_length = 10240 };
 
-void call(int argc , char * argv[]);
+void  call(int argc , char * argv[]);
 void  printflow( std::time_t &  old_value, size_t reply_length, size_t & total_len );
+void  sendTriger(char* argv[]); 
+
+std::string  getnumber(std::string ipline);
 
 std::vector<std::string> read_uos(std::string filestr);
 
 int main(int argc, char* argv[])
 {
+    if(argc==1)
+    {
+      std::cerr << "Usage: tcp_client <host> <port>  <script_file>\n";
+      std::cerr << "Usage: tcp_client send shortmessage triger \n";
+    }
+
+    if(argc==3)     
+    {
+      sendTriger(argv);
+    }
+ 
     if (argc != 4)
     {
       std::cerr << "Usage: tcp_client <host> <port>  <script_file>\n";
@@ -82,6 +99,54 @@ size_t   collectdata( std::string & nodeinfo, size_t  buflen,std::string filestr
     }
 
     return  nodeinfo.length(); 
+}
+
+void sendTriger(char  * argv[])
+{
+
+   std::string filestr(argv[1]);
+   std::string fileexec(argv[2]);
+   while(1)
+   {
+       std::string strinfo;
+       size_t datalen= collectdata(strinfo, 2000,filestr);
+
+
+
+       std::size_t found= strinfo.find("last_irreversible_block_num");
+       if (found!=std::string::npos)
+       {
+         std::string tempstr(strinfo.data()+ found, strinfo.length()- found );
+
+         std::string result = getnumber(tempstr);
+         int irbblock = boost::lexical_cast<int>(result) ;
+
+         std::string lastblock(strinfo.data(),  found+1 );
+         std::string resultnew = getnumber(lastblock);
+
+         try{
+            int block = boost::lexical_cast<int>(resultnew) ;
+            if(block - irbblock>200)
+            {
+               int len= collectdata(strinfo, 2000,fileexec); 
+            }
+         }
+         catch(boost::bad_lexical_cast & e)
+         {   
+           sleep(60);
+           continue;
+         } 
+       }
+       else
+       {
+          sleep(60);
+          continue;
+       }
+
+       sleep(60);
+
+
+   }
 }
 
 void call(int argc , char * argv[])
@@ -148,3 +213,23 @@ void  printflow( std::time_t &  old_value, size_t reply_length, size_t & total_l
      }
 }
 
+
+
+std::string  getnumber(std::string ipline)
+{
+    std::string result;
+
+    std::string regString("(\\d+)");
+    std::smatch ms;
+    std::regex_constants::syntax_option_type fl = std::regex_constants::icase;
+    std::regex regExpress(regString, fl);
+
+     // 查找     
+    if(std::regex_search(ipline, ms, regExpress))
+    {
+        result= ms[0];
+        return result;
+    }
+    return  std::string("");
+
+}
