@@ -85,6 +85,13 @@ void uselog()
     testlog();
 }
 
+void test()
+{
+   std::string strinfo,remoteinfo,masterinfo;
+   int datalen= collectdata(strinfo, 2000,"/home/vds/vdsmoni/getvds.sh");
+   std::cout << "itest print"<<datalen  << strinfo<<"  testinfo "<<std::endl; 
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -94,8 +101,12 @@ int main(int argc, char* argv[])
       std::cerr << "Usage: vds_moni\n";
       return 1;
     }
+
+    test();
     call();
 }
+
+
 
 namespace bp = ::boost::process;
 
@@ -135,7 +146,8 @@ void call()
     std::time_t  node_start_time=0;
     int  nMasterStatusCount=6;
     int  waitTime1 = 10*60 , waitTime2= 5*60 , waitTime3= 60; 
-     int  nGetInfoCount=0;
+    int  nGetInfoCount=0;
+    int  nrecovery=0; 
 
     // do every step , stop 3 minute;  
        
@@ -171,6 +183,7 @@ void call()
              //  datalen= collectdata(vdsdisstart , 2000,"/home/vds/vdsmoni/vdsstart.sh");
              std::string resstr = do_exec( "/home/vds/vdsmoni/vdsstart.sh"  );
              nGetInfoCount=0;
+             nrecovery=1; 
 
              oldblockno=0;
              sleep(2);
@@ -234,7 +247,7 @@ void call()
          }
          catch(boost::bad_lexical_cast & e)  
          {
-             BOOST_LOG_TRIVIAL(info) << "vdsnode getinfo failed,lexical  , now is  "<<nGetInfoCount<<"  "<<  ctime(&ut_second) << "  ";
+             BOOST_LOG_TRIVIAL(info) << "vdsnode getinfo failed,lexical  , info is"<<strinfo<<" now is "<<nGetInfoCount<<"  "<<  ctime(&ut_second) << "  ";
              nGetInfoCount++;
              if(nGetInfoCount > 20)
              { 
@@ -261,20 +274,20 @@ void call()
 
          BOOST_LOG_TRIVIAL(info) << "vdsnode localnode no "<< block << "  remotenode no  "<< remoteblock << "   now is  "<<  ctime(&ut_second) << "  ";
     
-         if(remoteblock<10000 || block <10000)
+         if( block <10000)
          {
              sleep(20);
              continue;
          }         
   
-         if(block < remoteblock-10 ) //need sync 
+         if(block+10 < remoteblock ) //need sync 
          {
              if(block > oldblockno ) 
              {   
                  oldblockno= block; 
                  sleep(120);
              }
-             else  // no sync need stop vds
+             else if( remoteblock>10000 )  // no sync need stop vds
              {
                  BOOST_LOG_TRIVIAL(info) << "vdsnode stop "<<block<<"  "<<oldblockno<<" now is  "<<  ctime(&ut_second) << "  ";
                  int len= collectdata(strinfo, 2000,"/home/vds/vdsmoni/vdsstop.sh");
@@ -297,6 +310,14 @@ void call()
                  BOOST_LOG_TRIVIAL(info) << "vdsnode masternode success,   now is  "<<  ctime(&ut_second) << "  ";
                  nMasternodestatus = 1;
                  nMasterStatusCount=0;
+                 if(nrecovery==1) 
+                 {
+                   nrecovery =0;
+                   std::string recvstr; 
+                   BOOST_LOG_TRIVIAL(info) << "vdsnode masternode recovery success,   now is  "<<  ctime(&ut_second) << "  ";
+                   datalen= collectdata(recvstr, 3000,"/home/vds/vdsmoni/recoverymaster.sh");                  
+      
+                 }
              }
              else
              {
@@ -307,6 +328,7 @@ void call()
                     BOOST_LOG_TRIVIAL(info) << "vdsnode masternode  failed ,send masternode   now is  "<<  ctime(&ut_second) << "  ";
                     nMasternodestatus = 0;
                     int len= collectdata(masterinfo, 2000,"/home/vds/vdsmoni/startmaster.sh");
+                    nrecovery = 1;
                  }
              } 
 
@@ -372,6 +394,8 @@ std::string   do_exec(std::string filestr )
        //std::cout<<"std::cout read uos  "<< std::endl; 
 }
 
+
+
 std::vector<std::string> read_vds(std::string filestr)
 {   
     //std::cout<<"std::cout read uos  "<< std::endl; 
@@ -379,15 +403,24 @@ std::vector<std::string> read_vds(std::string filestr)
     std::string line;
     
     bp::ipstream is; //reading pipe-stream
+    bp::ipstream err; //reading pipe-stream
+
     //bp::child c(bp::search_path("cluos"),"-u","http://10.186.11.220:9008", "get", "info",   bp::std_out > is);
-    bp::child c(bp::search_path("sh"), filestr,   bp::std_out > is);
+    bp::child c(bp::search_path("sh"), filestr,  bp::std_out > is, bp::std_err>err );
     //bp::child c(bp::search_path("gcc"),"-v",  bp::std_err >is);
-    
-    while (c.running() && std::getline(is, line) && !line.empty())
+
+    while ( is && std::getline(is, line) && !line.empty())
     {   
         data.push_back(line);
         //std::cout<<"std::cout "<< line<< std::endl; 
     }
+
+    while (err && std::getline(err, line) && !line.empty())
+    {   
+        data.push_back(line);
+        //std::cout<<"read_vds::cout "<< line<<" out "<< std::endl; 
+   }
+
     c.wait();
     
     return data;
