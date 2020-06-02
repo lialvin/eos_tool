@@ -25,6 +25,7 @@ enum { max_length = 10240 };
 std::vector<std::string> read_file(std::string filestr);
 void  genaccount(std::vector<std::string>& keys ,  std::vector<std::string> & newusers,   std::vector<std::string>&  creators );
 void  givemoney(std::vector<std::string> & creators,   std::vector<std::string> & newusers);
+void  genuidaccount(std::vector<std::string>& keys ,  std::vector<std::string> & newusers,   std::vector<std::string>&  creators);
 
 
 using namespace std;
@@ -33,7 +34,7 @@ int main(int argc, char* argv[])
 {
     if (argc != 2)
     {
-      std::cerr << "Usage: 1 givemoney ,2 gen account\n";
+      std::cerr << "Usage: 1 givemoney ,2 gen account 3 gen uid test\n";
       return 1;
     }
 
@@ -47,6 +48,9 @@ int main(int argc, char* argv[])
        givemoney( creators,  newusers)  ;     
     if(strcmd.find("2")!=std::string::npos)
        genaccount( keys , newusers, creators)  ;     
+    if(strcmd.find("3")!=std::string::npos)
+       genuidaccount( keys , newusers, creators)  ;     
+
 }
 
 void  givemoney(std::vector<std::string> & creators,   std::vector<std::string> & newusers)  
@@ -75,6 +79,38 @@ void  givemoney(std::vector<std::string> & creators,   std::vector<std::string> 
   }
   fout<<"#Hello World";
   fout.close();
+
+}
+
+void  genuidaccount(std::vector<std::string>& keys ,  std::vector<std::string> & newusers,   std::vector<std::string>&  creators )
+{
+  fstream fout("uid.sh", ios::out);
+  if(!fout)
+  {
+     cout<<"文件打开失败！"<<endl;
+     exit(1);
+  }
+  int newcount = newusers.size();
+  int keycount = keys.size();
+  int creatorcount = creators.size(); 
+
+   fout<<"# .bashrc"<<std::endl;
+
+  fout <<"cli='cluos --wallet-url http://127.0.0.1:1177 -u http://114.67.37.198:9008'" <<std::endl;
+
+  for(int i =0 ; i< newcount; i++)
+  {
+    auto curkey= keys[i%keycount ] ;
+    auto curcreator = creators[i%creatorcount ];
+//cli  system newaccount uoswalletorg --transfer uosuidwallet  UOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV  --stake-net "0.5000 UOS" --stake-cpu "0.5000 UOS" --buy-ram-kbytes 6 
+    fout<<"$cli "  << "transfer ulorduserno1  uosuidwallet   \"100.0000 UOS\"  \""<< newusers[i] << "--\"  " <<std::endl;  
+    fout<<" $cli  "<< " system newaccount ulorduserno1  "     << "  --transfer  " << newusers[i]<< "  "<< curkey << " --stake-net \"0.5000 UOS\" --stake-cpu \"0.5000 UOS \" --buy-ram-kbytes 6  "<< std::endl;
+    fout<<"echo creater user "<< newusers[i] <<std::endl;
+    fout<<"sleep 6"<<std::endl;
+
+  }
+  fout<<"#Hello World";
+  fout.close();  
 
 
 }
