@@ -50,11 +50,56 @@ public:
    CTestA  aaa;
 };
 
+void printhelp()
+{
+       cout<<"1  help  :"  <<endl;
+       cout<<"2  h2b  ; readstrfiletohex  hexfile1 binfile2 "<<endl;
+       cout<<"3  b2h  ; readbintohex  binfile1  hexfile2    "<<endl;
+
+       cout<<"4  encrypt ;ras encrypt file  "<<endl;
+       cout<<"5  decrypt ;ras decrypt file  "<<endl;
+       cout<<"6  encryptint ;ras encrypt int  "<<endl;
+
+}
+
+void callFun(int argc, char* argv[] )
+{
+
+    if(argc<2) // help 
+    {
+       printhelp();
+       return ;
+    }
+
+    std::string stropt;
+    if(argc>1)
+    {
+        stropt = string(argv[1]);
+    }
+    if(stropt==string("help") )
+    {
+       printhelp();
+       return;
+    }
+    else if(stropt==string("h2b") )
+    {
+       readstrfiletohex(argv[1],argv[2]);
+       //readbintohex(argv[1],argv[2]);
+       return;
+    }
+    else if(stropt==string("b2h") ) ///from net
+    {
+       readbintohex(argv[1],argv[2]);
+       return ;
+       int blockno =boost::lexical_cast<uint64_t>(argv[2]);
+       return;
+    }
+}
 
 int main(int argc, char* argv[])
 {
 
-
+  
    CTest  bb;
    bb.aaa.datahandlefun_(1121,121);
    
@@ -63,99 +108,26 @@ int main(int argc, char* argv[])
    char * p; 
    char szBuf[128];
 
-   if(argc<3 ) return 0 ;
-    
-   readstrfiletohex(argv[1],argv[2]);
-   //readbintohex(argv[1],argv[2]);
+   // if(argc<3 ) return 0 ;
 
-   system("pause");
-
-   return 0;
-}
-#define  BUF_LEN 1000
-int   readbintohex( char *pinfile, char * poutfile  )
-{
-    char szbuf[BUF_LEN]="";
-
-    ifstream  ifile;  
-    ifile.open(pinfile ,std::ifstream::binary);  
-
-//    int readlen =0;
-//    inF.read(szbuf,1000000 );  
-    std::vector<char> readbuf;
-    while(ifile.read(szbuf, BUF_LEN))
-    {     
-        readbuf.insert(readbuf.end(), &szbuf[0],&(szbuf[0])+BUF_LEN); 
-    }
-    readbuf.insert(readbuf.end(), &szbuf[0],&(szbuf[0])+ifile.gcount()); 
-    ifile.close();
-
-
-    ofstream out(poutfile);  
-    int linenum = 0;
- 
-   char printbuf[32]=""; 
-   for(auto & achar : readbuf) 
+   try
    {
-       linenum++;
-       sprintf(printbuf,"0x%02x, ",(unsigned char )achar);
-       out<<printbuf;
-       if(linenum%8==0)
-       { 
-          out<<endl;
-       }
-   } 
 
-    out.close();  
-  
-}
+     std::cout <<" test read block file  "<<std::endl;
+     callFun(argc, argv );
 
-int   readstrfiletohex( char *pinfile, char * poutfile  )
-{
-   char buffer[1000]="";  
-   string  strreadfile; 
-   int readlen=0;
+     system("pause");
 
-   ifstream in(pinfile);  
-   if (! in.is_open())  
-   {    
-       cout << "Error opening file"; exit (1); 
-   }  
+    // thitio::chain::named_thread_pool thread_pool("abc",3);
+    // thread_pool.stop();
 
-   std::vector<char> readbuf;  
-   while (!in.eof() )  
-   {  
-       in.getline(buffer,1000);  
-       //readlen = in.read(buffer, 500);  
-       readlen= strlen(buffer);      
-        
-       readbuf.insert(readbuf.end(), &buffer[0],&(buffer[0])+readlen);
-       readbuf.push_back(0x0a);
-      
    }
-   readbuf.pop_back();
-   in.close();
-  
-
-   ofstream out(poutfile);  
-   int linenum = 0;
-   
-   out<<  "namespace json_tests{"<<endl ;
-   out<<  "static unsigned const char base58_keys_invalid[] = {"<<endl ;
-
-   char printbuf[32]=""; 
-
-   for(auto & achar : readbuf) 
+   catch (std::exception& e)
    {
-       linenum++;
-       sprintf(printbuf,"0x%02x, ",achar);
-       out<<printbuf;
-       if(linenum%8==0)
-       { 
-          out<<endl;
-       }
-   } 
-   out.close();
+      std::cerr << "Exception: " << e.what() << "\n";
+   }
+
+
    return 0;
 }
 
